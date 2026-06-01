@@ -12,3 +12,4 @@ __pycache__/
 venv/
 env/
 virality_training_data.csv
+data/
