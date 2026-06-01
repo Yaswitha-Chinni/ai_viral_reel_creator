@@ -31,10 +31,11 @@
                 <a href="#dashboard" class="nav-item active" id="nav-dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
                 <a href="#trends" class="nav-item" id="nav-trends"><i data-lucide="trending-up"></i> Trends</a>
                 <a href="#content-studio" class="nav-item" id="nav-studio"><i data-lucide="clapperboard"></i> Content Studio</a>
+                <a href="#reel-studio" class="nav-item" id="nav-reel-studio"><i data-lucide="film"></i> Reel Studio</a>
                 <a href="#analytics" class="nav-item" id="nav-analytics"><i data-lucide="bar-chart-3"></i> Analytics</a>
             </nav>
-            <div style="width: 120px; display: flex; justify-content: flex-end;">
-                <span class="pro-tag">HACKATHON v1.0</span>
+            <div style="width: 130px; display: flex; justify-content: flex-end;">
+                <span class="pro-tag">HACKATHON TRACK 2</span>
             </div>
         </div>
     </header>
@@ -58,94 +59,187 @@
                             <input type="text" id="niche-input" placeholder="Enter niche or topic (e.g. AI, Startups, Creator Economy)..." aria-label="Niche Topic Input">
                         </div>
                         <button class="generate-btn" id="generate-button">
-                            <span class="btn-text">Generate Blueprint</span>
+                            <span class="btn-text">Generate Ideas</span>
                             <i data-lucide="sparkles" class="sparkle-icon"></i>
                         </button>
                     </div>
 
                     <!-- Examples / Quick Tags -->
-                    <div class="quick-examples">
-                        <span class="examples-label">Try searching:</span>
-                        <div class="examples-tags">
-                            <button class="tag-btn" id="tag-ai" data-topic="AI">AI</button>
-                            <button class="tag-btn" id="tag-startups" data-topic="Startups">Startups</button>
-                            <button class="tag-btn" id="tag-technology" data-topic="Technology">Technology</button>
-                            <button class="tag-btn" id="tag-finance" data-topic="Finance">Finance</button>
-                            <button class="tag-btn" id="tag-creator" data-topic="Creator Economy">Creator Economy</button>
+                    <div class="quick-examples-row">
+                        <div class="quick-examples">
+                            <span class="examples-label">Try searching:</span>
+                            <div class="examples-tags">
+                                <button class="tag-btn" id="tag-ai" data-topic="AI">AI</button>
+                                <button class="tag-btn" id="tag-startups" data-topic="Startups">Startups</button>
+                                <button class="tag-btn" id="tag-technology" data-topic="Technology">Technology</button>
+                                <button class="tag-btn" id="tag-finance" data-topic="Finance">Finance</button>
+                                <button class="tag-btn" id="tag-creator" data-topic="Creator Economy">Creator Economy</button>
+                            </div>
+                        </div>
+                        <!-- Demo Mode Trigger Button -->
+                        <button class="demo-trigger-btn" id="hackathon-demo-button">
+                            <i data-lucide="play-circle"></i> Launch Hackathon Demo Mode
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Columns Layout -->
+            <div class="dashboard-columns-grid">
+                
+                <!-- Left: Stats & Workflow Node Map -->
+                <div class="dashboard-col flex-column">
+                    <!-- Quick Stats Panel -->
+                    <div class="quick-stats-grid">
+                        <div class="glassmorphism stat-card">
+                            <div class="stat-icon-wrapper purple"><i data-lucide="compass"></i></div>
+                            <div class="stat-data">
+                                <span class="stat-label">Total Trends Found</span>
+                                <h2 class="stat-value" id="stat-total-trends">10</h2>
+                            </div>
+                        </div>
+                        <div class="glassmorphism stat-card">
+                            <div class="stat-icon-wrapper blue"><i data-lucide="award"></i></div>
+                            <div class="stat-data">
+                                <span class="stat-label">Average Trend Score</span>
+                                <h2 class="stat-value" id="stat-avg-trend-score">82.4</h2>
+                            </div>
+                        </div>
+                        <div class="glassmorphism stat-card">
+                            <div class="stat-icon-wrapper cyan"><i data-lucide="trending-up"></i></div>
+                            <div class="stat-data">
+                                <span class="stat-label">Average Virality Score</span>
+                                <h2 class="stat-value" id="stat-avg-virality-score">92%</h2>
+                            </div>
+                        </div>
+                        <div class="glassmorphism stat-card">
+                            <div class="stat-icon-wrapper pink"><i data-lucide="copy"></i></div>
+                            <div class="stat-data">
+                                <span class="stat-label">Generated Content Count</span>
+                                <h2 class="stat-value" id="stat-content-count">3 Assets</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Workflow Visualization Flow (Pipeline Node Map) -->
+                    <div class="pipeline-flow-wrapper glassmorphism">
+                        <div class="panel-header">
+                            <h3 class="panel-title"><i data-lucide="git-branch" class="title-icon icon-purple"></i> AI Agent Pipeline Flow</h3>
+                            <p class="panel-subtitle">Multi-agent data movement mapping 8 sequential processing blocks.</p>
+                        </div>
+                        <div class="pipeline-visual-nodes">
+                            <div class="pipeline-node active" id="pnode-1">
+                                <div class="pnode-dot"><i data-lucide="search"></i></div>
+                                <div class="pnode-label">Trend Discovery</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-2">
+                                <div class="pnode-dot"><i data-lucide="sliders"></i></div>
+                                <div class="pnode-label">Trend Ranking</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-3">
+                                <div class="pnode-dot"><i data-lucide="lightbulb"></i></div>
+                                <div class="pnode-label">Content Ideas</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-4">
+                                <div class="pnode-dot"><i data-lucide="clapperboard"></i></div>
+                                <div class="pnode-label">Reel Scripting</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-5">
+                                <div class="pnode-dot"><i data-lucide="film"></i></div>
+                                <div class="pnode-label">Reel Studio</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-6">
+                                <div class="pnode-dot"><i data-lucide="linkedin"></i></div>
+                                <div class="pnode-label">LinkedIn Agent</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-7">
+                                <div class="pnode-dot"><i data-lucide="instagram"></i></div>
+                                <div class="pnode-label">Instagram Agent</div>
+                            </div>
+                            <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
+                            <div class="pipeline-node active" id="pnode-8">
+                                <div class="pnode-dot"><i data-lucide="bar-chart-3"></i></div>
+                                <div class="pnode-label">XGBoost prediction</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Quick Stats Panel -->
-            <div class="quick-stats-grid">
-                <div class="glassmorphism stat-card">
-                    <div class="stat-icon-wrapper purple"><i data-lucide="compass"></i></div>
-                    <div class="stat-data">
-                        <span class="stat-label">Total Trends Found</span>
-                        <h2 class="stat-value" id="stat-total-trends">10</h2>
+                <!-- Right: AI Agent Execution monitor panel -->
+                <div class="dashboard-col">
+                    <div class="glassmorphism content-card" id="agent-monitor-panel">
+                        <div class="panel-header">
+                            <span class="badge badge-neon">Control Room</span>
+                            <h3 class="panel-title"><i data-lucide="cpu" class="title-icon"></i> AI Agent Monitor</h3>
+                            <p class="panel-subtitle">Active execution status logs of pipeline subagents</p>
+                        </div>
+                        <div class="agent-monitor-list">
+                            <div class="agent-monitor-row" id="monitor-agent-1">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 1</span>
+                                    <span class="agent-name">Trend Discovery Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-2">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 2</span>
+                                    <span class="agent-name">Trend Ranking Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-3">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 3</span>
+                                    <span class="agent-name">Content Idea Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-4">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 4</span>
+                                    <span class="agent-name">Script Generation Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-5">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 5</span>
+                                    <span class="agent-name">Reel Production Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-6">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 6</span>
+                                    <span class="agent-name">LinkedIn Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-7">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 7</span>
+                                    <span class="agent-name">Instagram Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                            <div class="agent-monitor-row" id="monitor-agent-8">
+                                <div class="agent-info-col">
+                                    <span class="agent-badge">Agent 8</span>
+                                    <span class="agent-name">Virality Prediction Agent</span>
+                                </div>
+                                <span class="agent-status-tag waiting">Waiting</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="glassmorphism stat-card">
-                    <div class="stat-icon-wrapper blue"><i data-lucide="award"></i></div>
-                    <div class="stat-data">
-                        <span class="stat-label">Average Trend Score</span>
-                        <h2 class="stat-value" id="stat-avg-trend-score">82.4</h2>
-                    </div>
-                </div>
-                <div class="glassmorphism stat-card">
-                    <div class="stat-icon-wrapper cyan"><i data-lucide="trending-up"></i></div>
-                    <div class="stat-data">
-                        <span class="stat-label">Average Virality Score</span>
-                        <h2 class="stat-value" id="stat-avg-virality-score">87%</h2>
-                    </div>
-                </div>
-                <div class="glassmorphism stat-card">
-                    <div class="stat-icon-wrapper pink"><i data-lucide="copy"></i></div>
-                    <div class="stat-data">
-                        <span class="stat-label">Generated Content Count</span>
-                        <h2 class="stat-value" id="stat-content-count">3 Assets</h2>
-                    </div>
-                </div>
-            </div>
 
-            <!-- AI Workflow Visualization Flow (Pipeline Node Map) -->
-            <div class="pipeline-flow-wrapper glassmorphism">
-                <div class="panel-header">
-                    <h3 class="panel-title"><i data-lucide="git-branch" class="title-icon icon-purple"></i> AI Agent Pipeline Flow</h3>
-                    <p class="panel-subtitle">Sequential execution data path of our autonomous content creation workspace.</p>
-                </div>
-                <div class="pipeline-visual-nodes">
-                    <div class="pipeline-node active" id="pnode-1">
-                        <div class="pnode-dot"><i data-lucide="search"></i></div>
-                        <div class="pnode-label">Trend Discovery</div>
-                    </div>
-                    <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
-                    <div class="pipeline-node active" id="pnode-2">
-                        <div class="pnode-dot"><i data-lucide="sliders"></i></div>
-                        <div class="pnode-label">Trend Ranking</div>
-                    </div>
-                    <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
-                    <div class="pipeline-node active" id="pnode-3">
-                        <div class="pnode-dot"><i data-lucide="clapperboard"></i></div>
-                        <div class="pnode-label">Reel Scripting</div>
-                    </div>
-                    <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
-                    <div class="pipeline-node active" id="pnode-4">
-                        <div class="pnode-dot"><i data-lucide="linkedin"></i></div>
-                        <div class="pnode-label">LinkedIn Copy</div>
-                    </div>
-                    <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
-                    <div class="pipeline-node active" id="pnode-5">
-                        <div class="pnode-dot"><i data-lucide="instagram"></i></div>
-                        <div class="pnode-label">Instagram Feed</div>
-                    </div>
-                    <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
-                    <div class="pipeline-node active" id="pnode-6">
-                        <div class="pnode-dot"><i data-lucide="bar-chart-3"></i></div>
-                        <div class="pnode-label">XGBoost Virality</div>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -186,7 +280,7 @@
             <div class="view-header flex-header">
                 <div>
                     <h2 class="view-title"><i data-lucide="clapperboard"></i> Content Studio</h2>
-                    <p class="view-subtitle">Copywriting blueprints optimized for short-form retention and organic feed reach</p>
+                    <p class="view-subtitle">Content ideation and copywriting panels. Select an Idea to generate scripts and timelines.</p>
                 </div>
                 <!-- Control Buttons -->
                 <div class="action-buttons-studio">
@@ -197,7 +291,7 @@
                         <i data-lucide="rotate-cw"></i> Regenerate
                     </button>
                     <button class="studio-action-btn export-studio-btn" id="studio-export-btn">
-                        <i data-lucide="download"></i> Export Report (.md)
+                        <i data-lucide="download"></i> Download Export Package (.md)
                     </button>
                 </div>
             </div>
@@ -205,7 +299,8 @@
             <div class="studio-workspace glassmorphism">
                 <!-- Sub Tab Nav bar -->
                 <div class="studio-tabs-bar">
-                    <button class="studio-tab-item active" id="tab-reel"><i data-lucide="video"></i> Reel Script</button>
+                    <button class="studio-tab-item active" id="tab-ideas"><i data-lucide="lightbulb"></i> Content Ideas</button>
+                    <button class="studio-tab-item" id="tab-reel"><i data-lucide="video"></i> Reel Script</button>
                     <button class="studio-tab-item" id="tab-linkedin"><i data-lucide="linkedin"></i> LinkedIn Post</button>
                     <button class="studio-tab-item" id="tab-instagram"><i data-lucide="instagram"></i> Instagram Caption</button>
                 </div>
@@ -213,8 +308,19 @@
                 <!-- Studio Output Editor Area -->
                 <div class="studio-editor-content">
                     
+                    <!-- TAB 0: CONTENT IDEAS WORKSPACE -->
+                    <div class="studio-tab-panel active" id="panel-ideas">
+                        <div class="ideas-panel-header">
+                            <h3>Brainstormed Campaign Hooks</h3>
+                            <p>Select one idea from the options below to compile scripts, storyboards, and forecasts.</p>
+                        </div>
+                        <div class="ideas-list-wrapper" id="studio-ideas-container">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
                     <!-- TAB 1: REEL SCRIPT WORKSPACE -->
-                    <div class="studio-tab-panel active" id="panel-reel">
+                    <div class="studio-tab-panel" id="panel-reel">
                         <div class="reel-script-output">
                             <div class="script-segment">
                                 <div class="segment-label"><i data-lucide="anchor"></i> Hook (0-5s)</div>
@@ -283,7 +389,68 @@
         </section>
 
         <!-- ==========================================
-             4. ANALYTICS VIEW
+             4. REEL STUDIO VIEW (NEW PAGE)
+             ========================================== -->
+        <section id="reel-studio-view" class="view-section hide">
+            <div class="view-header">
+                <h2 class="view-title"><i data-lucide="film"></i> Reel Production Studio</h2>
+                <p class="view-subtitle">Scene-by-scene storyboard, thumbnail prompts, and B-roll directions for automated video creation</p>
+            </div>
+
+            <div class="reel-studio-layout-grid">
+                
+                <!-- Left: Voiceover and Thumbnail prompts -->
+                <div class="reel-studio-left-col">
+                    
+                    <div class="glassmorphism content-card">
+                        <div class="panel-header">
+                            <span class="badge badge-purple">Voiceover</span>
+                            <h3 class="panel-title"><i data-lucide="mic"></i> Voiceover Script</h3>
+                        </div>
+                        <p class="voiceover-text-block" id="rstudio-voiceover-text">Loading narration block...</p>
+                    </div>
+
+                    <div class="glassmorphism content-card">
+                        <div class="panel-header">
+                            <span class="badge badge-blue">Visuals</span>
+                            <h3 class="panel-title"><i data-lucide="image"></i> Thumbnail Prompt</h3>
+                            <p class="panel-subtitle">Text-to-image prompt to generate a high CTR cover image</p>
+                        </div>
+                        <div class="prompt-box-area">
+                            <p class="prompt-text" id="rstudio-thumbnail-prompt">Loading cover prompt...</p>
+                            <button class="prompt-copy-btn" id="copy-thumb-prompt-btn"><i data-lucide="copy"></i> Copy Prompt</button>
+                        </div>
+                    </div>
+
+                    <div class="glassmorphism content-card">
+                        <div class="panel-header">
+                            <span class="badge badge-cyan">Flow</span>
+                            <h3 class="panel-title"><i data-lucide="video-off"></i> B-Roll Direction</h3>
+                        </div>
+                        <p class="voiceover-text-block" id="rstudio-broll-text">Loading scene footage suggestions...</p>
+                    </div>
+
+                </div>
+
+                <!-- Right: Timeline scene-by-scene breakdown -->
+                <div class="reel-studio-right-col glassmorphism content-card">
+                    <div class="panel-header">
+                        <span class="badge badge-neon">Storyboard</span>
+                        <h3 class="panel-title"><i data-lucide="calendar"></i> Scene-by-Scene Timeline</h3>
+                        <p class="panel-subtitle">Chronological visual assets, B-roll overlays, and subtitle syncs</p>
+                    </div>
+                    
+                    <!-- Vertical Timeline -->
+                    <div class="timeline-container" id="rstudio-scenes-timeline">
+                        <!-- Scene Nodes loaded dynamically -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==========================================
+             5. ANALYTICS VIEW
              ========================================== -->
         <section id="analytics-view" class="view-section hide">
             <div class="view-header">
@@ -390,9 +557,9 @@
                         <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
                     <div class="wstep-details">
-                        <span class="wstep-number">Step 1</span>
-                        <h4>Select Topic</h4>
-                        <p class="wstep-desc">Register niche keyphrases...</p>
+                        <span class="wstep-number">Agent 1</span>
+                        <h4>Trend Discovery</h4>
+                        <p class="wstep-desc">Discovering news feeds...</p>
                     </div>
                 </div>
 
@@ -402,9 +569,9 @@
                         <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
                     <div class="wstep-details">
-                        <span class="wstep-number">Step 2</span>
-                        <h4>Discover Trends</h4>
-                        <p class="wstep-desc">Querying RSS & Reddit indices...</p>
+                        <span class="wstep-number">Agent 2</span>
+                        <h4>Trend Ranking</h4>
+                        <p class="wstep-desc">Ranking with RandomForest...</p>
                     </div>
                 </div>
 
@@ -414,9 +581,9 @@
                         <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
                     <div class="wstep-details">
-                        <span class="wstep-number">Step 3</span>
-                        <h4>Rank Trends</h4>
-                        <p class="wstep-desc">Evaluating RandomForest metric weights...</p>
+                        <span class="wstep-number">Agent 3</span>
+                        <h4>Content Ideas</h4>
+                        <p class="wstep-desc">Brainstorming hooks...</p>
                     </div>
                 </div>
 
@@ -426,9 +593,9 @@
                         <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
                     <div class="wstep-details">
-                        <span class="wstep-number">Step 4</span>
-                        <h4>Generate Script</h4>
-                        <p class="wstep-desc">Drafting retention reel blueprint...</p>
+                        <span class="wstep-number">Agent 4</span>
+                        <h4>Script Generator</h4>
+                        <p class="wstep-desc">Drafting vertical script...</p>
                     </div>
                 </div>
 
@@ -438,9 +605,9 @@
                         <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
                     <div class="wstep-details">
-                        <span class="wstep-number">Step 5</span>
-                        <h4>Generate Social Content</h4>
-                        <p class="wstep-desc">Copywriting Instagram & LinkedIn feeds...</p>
+                        <span class="wstep-number">Agent 5</span>
+                        <h4>Reel Production</h4>
+                        <p class="wstep-desc">Compiling Reel Studio timelined data...</p>
                     </div>
                 </div>
 
@@ -450,9 +617,33 @@
                         <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
                     <div class="wstep-details">
-                        <span class="wstep-number">Step 6</span>
-                        <h4>Predict Virality</h4>
-                        <p class="wstep-desc">Running XGBoost regression analysis...</p>
+                        <span class="wstep-number">Agent 6</span>
+                        <h4>LinkedIn Agent</h4>
+                        <p class="wstep-desc">Optimizing social post copy...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-7">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Agent 7</span>
+                        <h4>Instagram Agent</h4>
+                        <p class="wstep-desc">Tailoring caption hashtags...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-8">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Agent 8</span>
+                        <h4>Virality Prediction</h4>
+                        <p class="wstep-desc">Evaluating forecast via XGBoost...</p>
                     </div>
                 </div>
 

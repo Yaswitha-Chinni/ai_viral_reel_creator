@@ -21,9 +21,9 @@ import requests
 load_dotenv()
 
 app = FastAPI(
-    title="Ratefluencer AI - API Server",
-    description="API for the Viral Reel Creator platform",
-    version="1.0.0"
+    title="Ratefluencer AI - API Server (Hackathon Edition)",
+    description="API for the Viral Reel Creator platform aligning with Track 2 requirements",
+    version="2.0.0"
 )
 
 # Configure Gemini
@@ -65,7 +65,6 @@ def call_gemini_safe(prompt):
         if "429" in err_msg or "resourceexhausted" in err_msg or "rate limit" in err_msg or "quota" in err_msg:
             print("Gemini rate limit hit. Sleeping for 3s...")
             time.sleep(3)
-            # Try once more
             try:
                 model = genai.GenerativeModel(gemini_model_name)
                 response = model.generate_content(prompt)
@@ -78,26 +77,104 @@ def call_gemini_safe(prompt):
 
 def get_mock_gemini_response(prompt):
     prompt_lower = prompt.lower()
-    if "hook" in prompt_lower and "insight1" in prompt_lower:
+    if "ideas" in prompt_lower or "target_audience" in prompt_lower:
+        # Content ideas generation
+        return json.dumps([
+            {
+                "title": "Why solo founders are deploying autonomous agent loops",
+                "target_audience": "Solopreneurs & Indie Hackers",
+                "virality_potential": "High",
+                "estimated_engagement": "92%"
+            },
+            {
+                "title": "The recursive API billing trap: audit your loops",
+                "target_audience": "SaaS Engineers",
+                "virality_potential": "Extreme",
+                "estimated_engagement": "96%"
+            },
+            {
+                "title": "Chatbots are dead, agent workspaces are taking over",
+                "target_audience": "Tech Enthusiasts & Founders",
+                "virality_potential": "Critical",
+                "estimated_engagement": "89%"
+            },
+            {
+                "title": "Auditing loop nodes in your vector database pipeline",
+                "target_audience": "Data Architects",
+                "virality_potential": "Moderate",
+                "estimated_engagement": "74%"
+            },
+            {
+                "title": "The ultimate framework for scaling Agentic AI in 2026",
+                "target_audience": "CTOs & Product Owners",
+                "virality_potential": "High",
+                "estimated_engagement": "82%"
+            }
+        ])
+    elif "scene" in prompt_lower or "voiceover_script" in prompt_lower:
+        # Reel studio generation
+        return json.dumps({
+            "voiceover_script": "Stop coding chat panels. The future of software is autonomous loops. Indie hackers are deploying recursive agent nodes to build complete applications in minutes. But be careful: unchecked loops can spike your API bills by 10x overnight. Save this post to learn how to audit your agent pipelines!",
+            "thumbnail_prompt": "A modern glow UI displaying recursive digital lines. Text overlay in bold Outfit typography: 'CHATS ARE DEAD: THE AGENTIC ERA.' Glowing cyan and purple accents, high tech dark background.",
+            "b_roll_suggestions": "Close-up of keyboard typing, terminal code scrolling, floating agent loop diagram, credit card invoice showing high API usage, mobile screen warning alert.",
+            "scenes": [
+                {
+                    "scene_number": 1,
+                    "duration": "0-5s",
+                    "title": "Scene 1: Hook visual",
+                    "visual_prompt": "Close-up of a developer shutting down a standard chat screen. Transitioning to a glowing recursive database console.",
+                    "b_roll": "Close-up of hands shutting laptop screen.",
+                    "subtitle": "Stop coding chat panels. The future is autonomous loops."
+                },
+                {
+                    "scene_number": 2,
+                    "duration": "5-20s",
+                    "title": "Scene 2: Problem visualization",
+                    "visual_prompt": "Screen view showing a fast-scrolling terminal running agent scripts, with a high API usage overlay blinking in neon orange.",
+                    "b_roll": "Fast scrolling code on terminal.",
+                    "subtitle": "Indie hackers are deploying loop agents... but it can spike your API bills by 10x!"
+                },
+                {
+                    "scene_number": 3,
+                    "duration": "20-35s",
+                    "title": "Scene 3: Main insight",
+                    "visual_prompt": "A diagram mapping a loop node audit workflow. Highlights of database auditing tools glowing in neon purple.",
+                    "b_roll": "Audit diagram workflow panning.",
+                    "subtitle": "Audit your loops and scale agent workloads safely."
+                },
+                {
+                    "scene_number": 4,
+                    "duration": "35-45s",
+                    "title": "Scene 4: Call to action",
+                    "visual_prompt": "End screen showing social icon handles with a pulse effect. Text overlay: 'SAVE FOR LATER'.",
+                    "b_roll": "Save icon animation pulsing.",
+                    "subtitle": "Tap follow and save this post to audit your pipelines!"
+                }
+            ]
+        })
+    elif "hook" in prompt_lower and "insight1" in prompt_lower:
         # Reel script request
         return json.dumps({
-            "hook": "Stop scrolling! This single AI tool is disrupting a $10B industry.",
-            "insight1": "A new autonomous coding agent has just been released with 90% accuracy.",
-            "insight2": "Developers are using it to build full applications in under 5 minutes.",
-            "insight3": "Major tech companies are already integrating this into their core pipelines.",
-            "cta": "Comment 'AGENT' and I'll send it to you!"
+            "hook": "Stop coding chat panels. The future of software is autonomous loops.",
+            "story": "Developers are deploying recursive agent pipelines to build SaaS projects in minutes. But recursive loops can spike your API bills by 10x overnight.",
+            "insights": [
+                "Agent nodes execute multi-step tasks autonomously.",
+                "Recursive loops without limits can lead to infinite API bills.",
+                "Auditing loop iterations prevents high billing spikes."
+            ],
+            "cta": "Tap follow to audit your loop nodes!"
         })
     elif "linkedin" in prompt_lower:
         return json.dumps({
-            "post": "AI is evolving faster than anyone predicted. 🤯\n\nA new autonomous coding agent was just released, demonstrating 90% accuracy on real-world engineering tasks. Developers are now building complete applications in minutes.\n\nHere are 3 key takeaways:\n1️⃣ The barrier to entry for software development is hitting zero.\n2️⃣ AI agents are transitioning from simple completion tools to fully autonomous collaborators.\n3️⃣ Companies that fail to integrate agentic workflows within the next 6 months will fall behind.\n\nHow is your team preparing for the agentic era? Let's discuss in the comments 👇",
-            "hashtags": "#ArtificialIntelligence #TechTrends #SoftwareEngineering #FutureOfWork #SaaS",
-            "hook": "AI is evolving faster than anyone predicted. 🤯"
+            "post": "SaaS architecture is pivoting. Autonomous loops are replacing text prompts. 🤖\n\nSolo developers are currently using multi-agent loops to construct full projects. However, unchecked recursive pipelines are causing massive database overhead and infinite API bills.\n\nHere are 3 keys to building loop agents safely:\n1️⃣ Establish iteration caps: Hard limits prevent infinite loops.\n2️⃣ Implement budget alerts: Real-time spend caps block runaway requests.\n3️⃣ Run local audit logs: Track recursive nodes before production push.\n\nAre you building traditional chat interfaces, or are you deploying loop nodes?",
+            "hashtags": "#ArtificialIntelligence #SaaS #FutureOfCoding #DatabaseDesign",
+            "hook": "SaaS architecture is pivoting. Autonomous loops are replacing text prompts. 🤖"
         })
     elif "instagram" in prompt_lower:
         return json.dumps({
-            "caption": "The future of coding is here and it is fully autonomous. ⚡ This new AI coding agent is solving complex tasks in seconds, putting application building in the hands of everyone. Is software engineering changing forever? Let me know your thoughts!",
-            "hashtags": "#ai #tech #startups #developer #coding #futureoftech #viralreels",
-            "cta": "Link in bio to read the full breakdown!"
+            "caption": "Chats are legacy. Loops are next. ⚡ Solo founders are scaling systems by deploying autonomous agent nodes. But beware of recursive API traps! Swipe left to read how to build loops safely! 👇",
+            "hashtags": "#aidevelopment #agentic #saasstartup #codinglife #databaseaudit #indiehackers",
+            "cta": "Save this reel to protect your vector pipelines! 📌"
         })
     elif "novelty" in prompt_lower:
         return "85"
@@ -148,7 +225,7 @@ rf_model = RandomForestRegressor(n_estimators=15, random_state=42)
 rf_model.fit(X_rf, y_rf)
 
 def compute_sentiment(title):
-    pos_triggers = ["breakthrough", "new", "release", "future", "epic", "scale", "power", "unreal", "quantum", "openai", "verge", "techcrunch", "ai", "agent"]
+    pos_triggers = ["breakthrough", "new", "release", "future", "epic", "scale", "power", "unreal", "quantum", "openai", "verge", "techcrunch", "ai", "agent", "loop"]
     neg_triggers = ["fail", "mistake", "scam", "danger", "worst", "bug", "stagnant", "broke", "expensive", "layoffs"]
     title_lower = title.lower()
     score = 0.0
@@ -161,29 +238,30 @@ def compute_sentiment(title):
     return max(min(score, 1.0), -1.0)
 
 # Request Models
-class GenerateRequest(BaseModel):
+class GenerateIdeasRequest(BaseModel):
     topic: str
 
-# API Endpoints
-@app.post("/api/generate")
-async def generate_workflow(req: GenerateRequest):
+class GenerateAssetsRequest(BaseModel):
+    niche: str
+    selected_trend: dict
+    selected_idea: dict
+
+# ====================================================
+# STAGE 1 ENDPOINT: /api/generate-ideas
+# ====================================================
+@app.post("/api/generate-ideas")
+async def generate_ideas(req: GenerateIdeasRequest):
     niche = req.topic.strip()
     if not niche:
         niche = "Technology"
 
-    print(f"Starting pipeline execution for niche: {niche}")
+    print(f"STAGE 1: Fetching trends & ideas for niche: {niche}")
     
-    # ----------------------------------------------------
-    # STEP 1 & 2: TREND DISCOVERY AND RANKING
-    # ----------------------------------------------------
-    trends = []
-    
-    # Let's try RSS & Reddit fetch first
+    # Discovery
     headers = {"User-Agent": "ratefluencer_bot/1.0"}
     subreddits = ["MachineLearning", "startups", "technology"]
     all_posts = []
     
-    # Try fetching subreddits
     for sub in subreddits:
         try:
             url = f"https://www.reddit.com/r/{sub}/top/.json?t=day&limit=5"
@@ -202,7 +280,6 @@ async def generate_workflow(req: GenerateRequest):
         except Exception:
             pass
 
-    # Try TechCrunch/Verge RSS
     rss_feeds = {
         "TechCrunch": "https://techcrunch.com/feed/",
         "The Verge": "https://www.theverge.com/rss/index.xml"
@@ -221,57 +298,46 @@ async def generate_workflow(req: GenerateRequest):
         except Exception:
             pass
 
-    # Filter posts by keyword match or generate using Gemini if list is empty or niche is highly specific
     filtered_posts = []
     for p in all_posts:
         if niche.lower() in p["title"].lower() or niche.lower() in p["source"].lower():
             filtered_posts.append(p)
             
-    # If we have very few matches or niche is specific, we ask Gemini to generate 10 trending topics for this niche!
     if len(filtered_posts) < 5:
-        print(f"Generating niche-specific trends via Gemini for: {niche}")
         prompt = f"""
-        Generate exactly 10 trending news, topics, or debates currently viral in the "{niche}" niche.
-        For each topic, provide:
-        - "title": A short, viral headline/topic.
-        - "source": A simulated news source or platform (e.g. TechCrunch, Reddit r/finance, Twitter, Wired).
-        - "upvotes": An integer between 100 and 3000 representing engagement.
-        - "num_comments": An integer between 20 and 800.
-        
-        Respond with a JSON array of objects. Do not include markdown formatting like ```json.
+        Generate exactly 10 trending topics or news currently viral in the "{niche}" space.
+        Format as a JSON array of objects. Do not include markdown code block tags.
+        JSON Keys:
+        - "title": Topic title.
+        - "source": Platform source (e.g. TechCrunch, Reddit).
+        - "upvotes": Integer score (100 to 3000).
+        - "num_comments": Comments count (10 to 600).
         """
         gemini_res = call_gemini_safe(prompt)
         try:
-            # Clean up potential markdown formatting if returned
             cleaned_res = re.sub(r'^```json\s*|```$', '', gemini_res.strip(), flags=re.MULTILINE)
             generated_trends = json.loads(cleaned_res)
             for gt in generated_trends:
                 gt["created_utc"] = time.time() - random.randint(1000, 50000)
                 filtered_posts.append(gt)
         except Exception as e:
-            print(f"Failed to parse Gemini generated trends: {e}")
+            print(f"Failed to parse trends: {e}")
 
-    # If still empty, use fallback defaults
     if not filtered_posts:
         filtered_posts = [
-            {"title": f"The rise of Agentic AI in {niche}", "upvotes": 1420, "num_comments": 290, "created_utc": time.time() - 3600, "source": "TechCrunch"},
-            {"title": f"How startups are automating {niche} workflows", "upvotes": 850, "num_comments": 120, "created_utc": time.time() - 7200, "source": "r/startups"},
-            {"title": f"New regulations impacting {niche} developers", "upvotes": 610, "num_comments": 85, "created_utc": time.time() - 14400, "source": "The Verge"},
-            {"title": f"Open source tools taking over the {niche} space", "upvotes": 2100, "num_comments": 410, "created_utc": time.time() - 21600, "source": "r/technology"},
-            {"title": f"Why VC investment in {niche} is doubling in 2026", "upvotes": 540, "num_comments": 95, "created_utc": time.time() - 28800, "source": "TechCrunch"},
-            {"title": f"Mistakes you must avoid when building in {niche}", "upvotes": 990, "num_comments": 150, "created_utc": time.time() - 36000, "source": "r/technology"},
-            {"title": f"The ultimate framework for scaling your {niche} application", "upvotes": 1200, "num_comments": 180, "created_utc": time.time() - 43200, "source": "r/startups"},
-            {"title": f"Top 5 open-source libraries for {niche} development", "upvotes": 770, "num_comments": 65, "created_utc": time.time() - 50400, "source": "Wired"},
-            {"title": f"How the creator economy is changing {niche}", "upvotes": 490, "num_comments": 50, "created_utc": time.time() - 57600, "source": "Twitter"},
-            {"title": f"Is this new tool the death of standard practices in {niche}?", "upvotes": 1850, "num_comments": 310, "created_utc": time.time() - 64800, "source": "Reddit"}
+            {"title": f"The rise of Agentic AI loops in {niche}", "upvotes": 1840, "num_comments": 310, "created_utc": time.time() - 3600, "source": "TechCrunch"},
+            {"title": f"How startups are auditing recursive workflows in {niche}", "upvotes": 1100, "num_comments": 195, "created_utc": time.time() - 7200, "source": "r/startups"},
+            {"title": f"New regulations impacting open-source developers building in {niche}", "upvotes": 950, "num_comments": 80, "created_utc": time.time() - 14400, "source": "The Verge"},
+            {"title": f"Why vector databases are spiking across the {niche} space", "upvotes": 680, "num_comments": 52, "created_utc": time.time() - 21600, "source": "r/technology"},
+            {"title": f"Hackers leverage multi-agent models to exploit {niche} pipelines", "upvotes": 1050, "num_comments": 160, "created_utc": time.time() - 28800, "source": "r/technology"}
         ]
 
-    # Rank them using the RandomForest model
+    # RandomForest Ranking
     ranked_trends = []
     features = []
     current_time = time.time()
     
-    for p in filtered_posts[:15]:  # Limit to top 15 candidates
+    for p in filtered_posts[:12]:
         up_norm = min(p.get("upvotes", 0), 3000) / 3000.0
         cm_norm = min(p.get("num_comments", 0), 500) / 500.0
         sent = (compute_sentiment(p.get("title", "")) + 1.0) / 2.0
@@ -280,11 +346,11 @@ async def generate_workflow(req: GenerateRequest):
         features.append([up_norm, cm_norm, sent, hours_norm])
 
     preds = rf_model.predict(features) * 100.0
-    preds = np.clip(preds, 15.0, 99.5)
+    preds = np.clip(preds, 20.0, 99.5)
     
-    for i, p in enumerate(filtered_posts[:15]):
+    for i, p in enumerate(filtered_posts[:12]):
         final_score = round(preds[i], 1)
-        growth_vel = round(float(p.get("upvotes", 0) / ( (current_time - p.get("created_utc", 0)) / 3600.0 + 1.0 ) * 0.15), 1)
+        growth_vel = round(float(p.get("upvotes", 0) / ((current_time - p.get("created_utc", 0)) / 3600.0 + 1.0) * 0.15), 1)
         growth_vel = min(max(growth_vel, 10.0), 99.0)
         novelty = round(float((compute_sentiment(p.get("title", "")) + 1.2) * 40.0 + random.uniform(0, 10)), 1)
         novelty = min(max(novelty, 25.0), 98.0)
@@ -305,23 +371,61 @@ async def generate_workflow(req: GenerateRequest):
             "audience_relevance": relevance,
         })
         
-    ranked_trends = sorted(ranked_trends, key=lambda x: x["score"], reverse=True)[:10]
+    ranked_trends = sorted(ranked_trends, key=lambda x: x["score"], reverse=True)
     top_trend = ranked_trends[0]
 
-    # ----------------------------------------------------
-    # STEP 3: VIRAL REEL GENERATION
-    # ----------------------------------------------------
-    print(f"Writing script for top trend: {top_trend['title']}")
-    script_prompt = f"""
-    Write a 45-second high-retention social media reel script about the trending topic:
-    "{top_trend['title']}" in the niche: "{niche}".
+    # Generate 5 Content Ideas based on the winning trend
+    print(f"STAGE 1: Generating ideas for trend: {top_trend['title']}")
+    ideas_prompt = f"""
+    Based on this trending topic: "{top_trend['title']}" in the "{niche}" niche,
+    generate exactly 5 viral short-form content ideas.
     
-    Format the response strictly as a JSON object with these exact keys. Do not include any markdown format tags like ```json or ```.
+    Format the response strictly as a JSON array of objects. Do not include markdown code block tags.
+    JSON keys for each object:
+    - "title": A catchy hook/title of the idea.
+    - "target_audience": E.g. "Startup Founders", "Developers", "AI Creators".
+    - "virality_potential": A rating (e.g. "High", "Critical", "Extreme", "Moderate").
+    - "estimated_engagement": A percentage string (e.g. "88%", "94%").
+    """
+    ideas_text = call_gemini_safe(ideas_prompt)
+    try:
+        cleaned_ideas = re.sub(r'^```json\s*|```$', '', ideas_text.strip(), flags=re.MULTILINE)
+        content_ideas = json.loads(cleaned_ideas)
+    except Exception:
+        content_ideas = get_mock_gemini_response("ideas")
+
+    payload = {
+        "niche": niche,
+        "top_trend": top_trend,
+        "trends": ranked_trends,
+        "ideas": content_ideas
+    }
+
+    return JSONResponse(content=payload)
+
+
+# ====================================================
+# STAGE 2 ENDPOINT: /api/generate-assets
+# ====================================================
+@app.post("/api/generate-assets")
+async def generate_assets(req: GenerateAssetsRequest):
+    niche = req.niche
+    top_trend = req.selected_trend
+    selected_idea = req.selected_idea
+
+    print(f"STAGE 2: Generating assets for content idea: {selected_idea['title']}")
+    
+    # 1. Reel Script Writer
+    script_prompt = f"""
+    Write a 45-second vertical reel script based on this selected content idea:
+    Idea: "{selected_idea['title']}" (derived from trend: "{top_trend['title']}") in the "{niche}" niche.
+    
+    Format the response strictly as a JSON object. Do not include markdown code block tags.
     JSON Keys:
-    - "hook": An attention-grabbing hook (under 12 words) to stop the user from swiping.
-    - "story": A conversational 2-3 sentence explanation/narrative.
-    - "insights": A JSON array of exactly 3 bullet points/insights.
-    - "cta": A punchy call-to-action (under 8 words).
+    - "hook": Attention grabbing hook (under 12 words).
+    - "story": Spoken narrative (2-3 sentences).
+    - "insights": JSON array of exactly 3 bullet insights.
+    - "cta": Punchy call-to-action (under 8 words).
     """
     script_text = call_gemini_safe(script_prompt)
     try:
@@ -329,31 +433,57 @@ async def generate_workflow(req: GenerateRequest):
         script_data = json.loads(cleaned_script)
     except Exception:
         script_data = {
-            "hook": f"Here is why '{top_trend['title']}' is currently taking over {niche}!",
-            "story": f"Everyone in the creator space is talking about this development. It changes the way we look at {niche} scaling, paving the way for rapid, automated implementation.",
+            "hook": f"Stop scrolling! This single development in {niche} is changing everything.",
+            "story": f"We are officially moving from manual workflows to automated systems. The idea: '{selected_idea['title']}' is currently proving this transition across the creator economy.",
             "insights": [
-                "It reduces deployment cycles from weeks to just a few seconds.",
-                "It requires virtually zero upfront capital to kickstart production.",
-                "Pioneering creators are scaling engagement by 300% using this methodology."
+                "It reduces deployment cycles from days to simple automation segments.",
+                "It enables solo builders to scale reach at a corporate level.",
+                "Auditing operational nodes prevents infinite loop billing traps."
             ],
-            "cta": "Tap follow for daily insights!"
+            "cta": f"Comment '{niche.upper().replace(' ', '')}' for early access!"
         }
 
-    # ----------------------------------------------------
-    # STEP 4: LINKEDIN CONTENT GENERATOR
-    # ----------------------------------------------------
-    print("Generating LinkedIn post...")
-    linkedin_prompt = f"""
-    Create a highly professional, engaging LinkedIn post based on this viral script:
+    # 2. Automated Reel Production Studio Assets
+    production_prompt = f"""
+    Create a complete automated reel production studio package based on this script:
     Hook: {script_data['hook']}
     Story: {script_data['story']}
     Insights: {', '.join(script_data['insights'])}
+    CTA: {script_data['cta']}
     
     Format the response strictly as a JSON object. Do not include markdown code block tags.
     JSON Keys:
-    - "post": A formatted multi-line post with line breaks and appropriate emojis.
-    - "hashtags": 4-5 relevant LinkedIn hashtags (e.g. #Technology).
-    - "engagement_hook": A question at the end to spark debate.
+    - "voiceover_script": The complete vocal narration block.
+    - "thumbnail_prompt": Visual text-to-image prompt for the reel cover.
+    - "b_roll_suggestions": General description of b-roll flow.
+    - "scenes": A JSON array of exactly 4 objects (Scene 1: Hook visual, Scene 2: Problem visualization, Scene 3: Main insight, Scene 4: Call to action).
+      Each object must contain:
+      - "scene_number": Integer (1, 2, 3, 4)
+      - "duration": Duration string (e.g. "0-5s", "5-20s")
+      - "title": Scene title (e.g. "Scene 1: Hook visual")
+      - "visual_prompt": Concrete visual layout description for asset creators
+      - "b_roll": B-roll footage suggestions
+      - "subtitle": Exact subtitle overlay text
+    """
+    production_text = call_gemini_safe(production_prompt)
+    try:
+        cleaned_prod = re.sub(r'^```json\s*|```$', '', production_text.strip(), flags=re.MULTILINE)
+        production_data = json.loads(cleaned_prod)
+    except Exception:
+        production_data = get_mock_gemini_response("scene")
+
+    # 3. LinkedIn Post Generator
+    linkedin_prompt = f"""
+    Create an engaging, authority-building LinkedIn post based on this campaign:
+    Topic: {selected_idea['title']}
+    Insights: {', '.join(script_data['insights'])}
+    Target Audience: {selected_idea['target_audience']}
+    
+    Format the response strictly as a JSON object. Do not include markdown code block tags.
+    JSON Keys:
+    - "post": Formatted multi-line post text.
+    - "hashtags": Hashtags string.
+    - "engagement_hook": Conversational question at the end.
     """
     linkedin_text = call_gemini_safe(linkedin_prompt)
     try:
@@ -361,25 +491,22 @@ async def generate_workflow(req: GenerateRequest):
         linkedin_data = json.loads(cleaned_li)
     except Exception:
         linkedin_data = {
-            "post": f"The landscape of {niche} is changing right before our eyes. 🚀\n\nRecent developments show that '{top_trend['title']}' is gaining explosive momentum. Here are the core details you need to know:\n\n💡 Key takeaways:\n1. It reduces standard production timeframes drastically.\n2. Access is democratized, letting solo operators scale at enterprise level.\n3. The growth velocity is outpacing traditional methods by 3x.\n\nThis marks a new era in creators leveraging AI to dominate their spaces.",
+            "post": f"The landscape of {niche} is changing right before our eyes. 🚀\n\nIf your target is {selected_idea['target_audience']}, '{selected_idea['title']}' is gaining explosive momentum. Here are the core details you need to know:\n\n💡 Key takeaways:\n1. It reduces standard production timeframes drastically.\n2. Solo operators scale at enterprise level.\n3. Auditing loop iterations prevents recursive billing bottlenecks.\n\nThis marks a new era in creators leveraging AI to dominate their spaces.",
             "hashtags": f"#niche #StartupLife #BusinessGrowth #{niche.replace(' ', '')}",
             "engagement_hook": "Is this a temporary hype or the new normal? Let me know your thoughts!"
         }
 
-    # ----------------------------------------------------
-    # STEP 5: INSTAGRAM CONTENT GENERATOR
-    # ----------------------------------------------------
-    print("Generating Instagram post...")
+    # 4. Instagram Caption Generator
     instagram_prompt = f"""
-    Create an energetic Instagram post caption based on this viral script:
+    Create an energetic Instagram post caption based on this script:
     Hook: {script_data['hook']}
     Story: {script_data['story']}
     
     Format the response strictly as a JSON object. Do not include markdown code block tags.
     JSON Keys:
-    - "caption": A conversational caption (under 150 words) with emojis.
-    - "hashtags": 5-10 relevant hashtags.
-    - "cta": A call to action (e.g. Save this for later!).
+    - "caption": Instagram caption copy.
+    - "hashtags": Hashtags.
+    - "cta": IG Call-to-action block.
     """
     instagram_text = call_gemini_safe(instagram_prompt)
     try:
@@ -387,18 +514,13 @@ async def generate_workflow(req: GenerateRequest):
         instagram_data = json.loads(cleaned_ig)
     except Exception:
         instagram_data = {
-            "caption": f"Huge news in the {niche} scene today! 🔥 '{top_trend['title']}' is officially changing the game. If you're building in this space, you can't afford to ignore this. Let's discuss in the comments below! 👇",
+            "caption": f"Huge news in the {niche} scene today! 🔥 '{selected_idea['title']}' is officially changing the game. If you're building in this space, you can't afford to ignore this. Let's discuss in the comments below! 👇",
             "hashtags": f"#viralreels #growthmindset #{niche.lower().replace(' ', '')} #digitalmarketing #trends",
             "cta": "Save this reel for later! 📌"
         }
 
-    # ----------------------------------------------------
-    # STEP 6: VIRALITY PREDICTION
-    # ----------------------------------------------------
-    print("Running XGBoost virality prediction...")
+    # 5. XGBoost Virality Scoring
     hook_word_count = len(script_data['hook'].split())
-    
-    # Run XGBoost inference
     input_data = pd.DataFrame([{
         "trend_score": top_trend["score"],
         "hook_word_count": hook_word_count,
@@ -406,34 +528,31 @@ async def generate_workflow(req: GenerateRequest):
     }])
     pred_score = xgb_model.predict(input_data)[0]
     pred_score = round(float(pred_score), 1)
-    pred_score = min(max(pred_score, 35.0), 99.4)  # Clamp to reasonable virality scores
+    # Give a tiny boost if engagement estimate was high
+    est_engage_val = float(selected_idea["estimated_engagement"].replace("%",""))
+    pred_score = pred_score * 0.9 + (est_engage_val * 0.1)
+    pred_score = min(max(pred_score, 45.0), 99.8)
 
-    # Generate analytics cards metrics
-    expected_views = int(pred_score * 11500 + random.randint(5000, 25000))
-    expected_likes = int(expected_views * 0.075 + random.randint(100, 500))
-    expected_shares = int(expected_views * 0.025 + random.randint(15, 100))
-    expected_saves = int(expected_views * 0.045 + random.randint(30, 200))
+    expected_views = int(pred_score * 12500 + random.randint(10000, 35000))
+    expected_likes = int(expected_views * 0.082 + random.randint(200, 800))
+    expected_shares = int(expected_views * 0.028 + random.randint(30, 200))
+    expected_saves = int(expected_views * 0.048 + random.randint(50, 300))
 
-    # Generate charts data
-    # 1. Projected engagement over 24 hours (accumulated views)
     hourly_engagement = []
-    accumulated_views = 0
     for hour in range(1, 25):
-        # S-curve shape for viral views accumulation
-        multiplier = 1 / (1 + np.exp(-0.25 * (hour - 10)))
+        multiplier = 1 / (1 + np.exp(-0.24 * (hour - 10)))
         current_views = int(expected_views * multiplier)
         hourly_engagement.append({
             "hour": f"{hour}h",
             "views": current_views,
-            "likes": int(current_views * 0.075)
+            "likes": int(current_views * 0.082)
         })
 
-    # 2. Performance metrics comparison across platforms
     platform_performance = [
         {"platform": "Instagram Reels", "expected_reach": expected_views},
-        {"platform": "TikTok", "expected_reach": int(expected_views * 1.45)},
-        {"platform": "YouTube Shorts", "expected_reach": int(expected_views * 0.85)},
-        {"platform": "LinkedIn Video", "expected_reach": int(expected_views * 0.12)}
+        {"platform": "TikTok", "expected_reach": int(expected_views * 1.55)},
+        {"platform": "YouTube Shorts", "expected_reach": int(expected_views * 0.92)},
+        {"platform": "LinkedIn Video", "expected_reach": int(expected_views * 0.14)}
     ]
 
     virality_dashboard = {
@@ -446,12 +565,9 @@ async def generate_workflow(req: GenerateRequest):
         "platform_performance": platform_performance
     }
 
-    # Compile the final result
     payload = {
-        "niche": niche,
-        "top_trend": top_trend,
-        "trends": ranked_trends,
         "script": script_data,
+        "reel_studio": production_data,
         "linkedin": linkedin_data,
         "instagram": instagram_data,
         "virality": virality_dashboard

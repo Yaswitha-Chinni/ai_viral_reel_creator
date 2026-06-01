@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------------------
-   Ratefluencer AI - Core Frontend Logic (Multi-Page SaaS Router & Wizard)
+   Ratefluencer AI - Core Frontend Logic (Hackathon Track 2 Edition)
    -------------------------------------------------------------------------- */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nicheInput = document.getElementById('niche-input');
     const generateBtn = document.getElementById('generate-button');
     const quickTags = document.querySelectorAll('.tag-btn');
+    const demoBtn = document.getElementById('hackathon-demo-button');
 
     // DOM Elements - Wizard modal
     const wizardModal = document.getElementById('wizard-modal');
@@ -34,6 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const regenStudioBtn = document.getElementById('studio-regenerate-btn');
     const exportStudioBtn = document.getElementById('studio-export-btn');
     const studioToast = document.getElementById('studio-toast');
+    const ideasContainer = document.getElementById('studio-ideas-container');
+
+    // DOM Elements - Reel Production Studio
+    const rstudioVoiceover = document.getElementById('rstudio-voiceover-text');
+    const rstudioThumbnail = document.getElementById('rstudio-thumbnail-prompt');
+    const rstudioBroll = document.getElementById('rstudio-broll-text');
+    const rstudioTimeline = document.getElementById('rstudio-scenes-timeline');
+    const copyThumbPromptBtn = document.getElementById('copy-thumb-prompt-btn');
 
     // Chart instances
     let gaugeChartInstance = null;
@@ -42,12 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Generated data store
     let generatedData = null;
+    let generatedIdeasPayload = null; // Store trends and ideas from Stage 1
+    let activeNiche = "Creator Economy";
 
-    // Premium Demo Data (Loaded on startup to ensure hackathon judges see a full app instantly)
+    // Premium Demo Data (Loaded on startup & used in Demo Mode)
     const demoData = {
-        niche: "AI & Autonomous Agents",
+        niche: "Creator Economy",
         top_trend: {
-            title: "Agentic Workflows are replacing standard chat interfaces in SaaS",
+            title: "Auditing recursive loop nodes to prevent run-away vector database bills",
             source: "TechCrunch",
             upvotes: 1840,
             num_comments: 310,
@@ -57,137 +68,96 @@ document.addEventListener('DOMContentLoaded', () => {
             engagement_potential: 89.2,
             audience_relevance: 96.0
         },
-        trends: [
+        ideas: [
             {
-                title: "Agentic Workflows are replacing standard chat interfaces in SaaS",
-                source: "TechCrunch",
-                upvotes: 1840,
-                num_comments: 310,
-                score: 94.6,
-                growth_velocity: 88.5,
-                novelty: 92.0,
-                engagement_potential: 89.2,
-                audience_relevance: 96.0
+                title: "Why solo founders are deploying autonomous agent loops",
+                target_audience: "Solopreneurs & Indie Hackers",
+                virality_potential: "High",
+                estimated_engagement: "92%"
             },
             {
-                title: "New open source models outperform proprietary giants on local hardware",
-                source: "r/MachineLearning",
-                upvotes: 2150,
-                num_comments: 420,
-                score: 89.8,
-                growth_velocity: 82.1,
-                novelty: 87.5,
-                engagement_potential: 94.0,
-                audience_relevance: 85.0
+                title: "The recursive API billing trap: audit your loops",
+                target_audience: "SaaS Engineers",
+                virality_potential: "Extreme",
+                estimated_engagement: "96%"
             },
             {
-                title: "How developers are building entire SaaS projects in 10 minutes with AI tools",
-                source: "r/startups",
-                upvotes: 1100,
-                num_comments: 195,
-                score: 84.2,
-                growth_velocity: 78.4,
-                novelty: 75.0,
-                engagement_potential: 82.0,
-                audience_relevance: 91.5
+                title: "Chatbots are dead, agent workspaces are taking over",
+                target_audience: "Tech Enthusiasts & Founders",
+                virality_potential: "Critical",
+                estimated_engagement: "89%"
             },
             {
-                title: "Apple launches local agentic Siri framework on next-gen devices",
-                source: "The Verge",
-                upvotes: 1620,
-                num_comments: 280,
-                score: 81.5,
-                growth_velocity: 72.0,
-                novelty: 80.0,
-                engagement_potential: 78.5,
-                audience_relevance: 88.0
+                title: "Auditing loop nodes in your vector database pipeline",
+                target_audience: "Data Architects",
+                virality_potential: "Moderate",
+                estimated_engagement: "74%"
             },
             {
-                title: "SaaS seed funding pivots entirely towards agentic infrastructure startups",
-                source: "TechCrunch",
-                upvotes: 950,
-                num_comments: 80,
-                score: 79.1,
-                growth_velocity: 64.2,
-                novelty: 85.0,
-                engagement_potential: 62.0,
-                audience_relevance: 75.0
-            },
-            {
-                title: "Developers report high burnout as coding LLMs change team speed expectations",
-                source: "r/technology",
-                upvotes: 1350,
-                num_comments: 340,
-                score: 76.4,
-                growth_velocity: 68.0,
-                novelty: 65.0,
-                engagement_potential: 84.5,
-                audience_relevance: 82.0
-            },
-            {
-                title: "Vector database workloads hit record spikes across cloud service engines",
-                source: "Wired",
-                upvotes: 680,
-                num_comments: 52,
-                score: 71.0,
-                growth_velocity: 55.4,
-                novelty: 72.0,
-                engagement_potential: 48.0,
-                audience_relevance: 62.0
-            },
-            {
-                title: "Hackers leverage multi-agent frameworks to automate database testing",
-                source: "r/technology",
-                upvotes: 1050,
-                num_comments: 160,
-                score: 68.5,
-                growth_velocity: 58.0,
-                novelty: 76.0,
-                engagement_potential: 65.0,
-                audience_relevance: 55.0
-            },
-            {
-                title: "How to properly audit agent loops to prevent recursive API bills",
-                source: "r/startups",
-                upvotes: 520,
-                num_comments: 95,
-                score: 65.0,
-                growth_velocity: 45.0,
-                novelty: 68.0,
-                engagement_potential: 54.0,
-                audience_relevance: 79.0
-            },
-            {
-                title: "UX researchers argue that text prompts are a temporary step in AI evolution",
-                source: "Twitter",
-                upvotes: 890,
-                num_comments: 110,
-                score: 58.2,
-                growth_velocity: 49.0,
-                novelty: 74.0,
-                engagement_potential: 50.0,
-                audience_relevance: 68.0
+                title: "The ultimate framework for scaling Agentic AI in 2026",
+                target_audience: "CTOs & Product Owners",
+                virality_potential: "High",
+                estimated_engagement: "82%"
             }
         ],
         script: {
-            hook: "Stop building chat interfaces! The future of software is completely agentic.",
-            story: "We are officially moving from text chatbots to autonomous agents that execute tasks. Developers are now using loops to construct full SaaS projects in under 10 minutes.",
+            hook: "Stop coding chat panels. The future of software is autonomous loops.",
+            story: "Indie hackers are deploying recursive agent nodes to build complete applications in minutes. But unchecked loops can spike your API bills by 10x overnight.",
             insights: [
-                "Agentic workflows automate complex multi-step reasoning models.",
-                "It reduces deployment cycles from weeks to simple execution loops.",
-                "SaaS companies adopting loop nodes are cutting operation bills by 60%."
+                "Agent nodes execute multi-step tasks autonomously.",
+                "Recursive loops without limits can lead to infinite API bills.",
+                "Auditing loop iterations prevents high billing spikes."
             ],
-            cta: "Comment 'AGENT' and I'll send the source!"
+            cta: "Tap follow to audit your loop nodes!"
+        },
+        reel_studio: {
+            voiceover_script: "Stop coding chat panels. The future of software is autonomous loops. Indie hackers are deploying recursive agent nodes to build complete applications in minutes. But be careful: unchecked loops can spike your API bills by 10x overnight. Save this post to learn how to audit your agent pipelines!",
+            thumbnail_prompt: "A modern glow UI displaying recursive digital lines. Text overlay in bold Outfit typography: 'CHATS ARE DEAD: THE AGENTIC ERA.' Glowing cyan and purple accents, high tech dark background.",
+            b_roll_suggestions: "Close-up of keyboard typing, terminal code scrolling, floating agent loop diagram, credit card invoice showing high API usage, mobile screen warning alert.",
+            scenes: [
+                {
+                    scene_number: 1,
+                    duration: "0-5s",
+                    title: "Scene 1: Hook visual",
+                    visual_prompt: "Close-up of a developer shutting down a standard chat screen. Transitioning to a glowing recursive database console.",
+                    b_roll: "Close-up of hands shutting laptop screen.",
+                    subtitle: "Stop coding chat panels. The future is autonomous loops."
+                },
+                {
+                    scene_number: 2,
+                    duration: "5-20s",
+                    title: "Scene 2: Problem visualization",
+                    visual_prompt: "Screen view showing a fast-scrolling terminal running agent scripts, with a high API usage overlay blinking in neon orange.",
+                    b_roll: "Fast scrolling code on terminal.",
+                    subtitle: "Indie hackers are deploying loop agents... but it can spike your API bills by 10x!"
+                },
+                {
+                    scene_number: 3,
+                    duration: "20-35s",
+                    title: "Scene 3: Main insight",
+                    visual_prompt: "A diagram mapping a loop node audit workflow. Highlights of database auditing tools glowing in neon purple.",
+                    b_roll: "Audit diagram workflow panning.",
+                    subtitle: "Audit your loops and scale agent workloads safely."
+                },
+                {
+                    scene_number: 4,
+                    duration: "35-45s",
+                    title: "Scene 4: Call to action",
+                    visual_prompt: "End screen showing social icon handles with a pulse effect. Text overlay: 'SAVE FOR LATER'.",
+                    b_roll: "Save icon animation pulsing.",
+                    subtitle: "Tap follow and save this post to audit your pipelines!"
+                }
+            ]
         },
         linkedin: {
-            post: "The conversational AI era is ending. The agentic loops are taking over. 🤖\n\nFor the past two years, we've focused on text chatbots. Now, developers are deploying autonomous agent pipelines that write code, debug databases, and deploy SaaS apps in under 10 minutes.\n\nHere are the 3 major impacts:\n1️⃣ Prompting is fading: Task executors will replace basic chat input boxes.\n2️⃣ Solo operators can scale: Loop systems allow single devs to operate like a 10-person team.\n3️⃣ Operational costs are falling: Task automation reduces execution times by 3x.\n\nAre you building chat panels, or are you deploying agentic workflows?",
-            hashtags: "#ArtificialIntelligence #SaaS #FutureOfWork #ProductManagement",
+            post: "SaaS architecture is pivoting. Autonomous loops are replacing text prompts. 🤖\n\nSolo developers are currently using multi-agent loops to construct full projects. However, unchecked recursive pipelines are causing massive database overhead and infinite API bills.\n\nHere are 3 keys to building loop agents safely:\n1️⃣ Establish iteration caps: Hard limits prevent infinite loops.\n2️⃣ Implement budget alerts: Real-time spend caps block runaway requests.\n3️⃣ Run local audit logs: Track recursive nodes before production push.\n\nAre you building traditional chat interfaces, or are you deploying loop nodes?",
+            hashtags: "#ArtificialIntelligence #SaaS #FutureOfCoding #DatabaseDesign",
             engagement_hook: "How is your engineering team adapting to autonomous agent nodes? Let's discuss below!"
         },
         instagram: {
-            caption: "Chatbots are officially legacy tech. ⚡ Agentic workflows are replacing simple text interfaces, enabling systems to execute full development pipelines in minutes. Check out the blueprint below to see how to adapt your workflow! 👇",
-            hashtags: "#aiagents #agenticai #techtrends #startupfounder #softwaredev #futureofcoding",
-            cta: "Link in bio to read the full loop framework! 📌"
+            caption: "Chats are legacy. Loops are next. ⚡ Solo founders are scaling systems by deploying autonomous agent nodes. But beware of recursive API traps! Swipe left to read how to build loops safely! 👇",
+            hashtags: "#aidevelopment #agentic #saasstartup #codinglife #databaseaudit #indiehackers",
+            cta: "Save this reel to protect your vector pipelines! 📌"
         },
         virality: {
             virality_score: 92.4,
@@ -221,33 +191,38 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleRouting() {
         const hash = window.location.hash || '#dashboard';
         
-        // Remove active class from all links and hide all sections
+        // Remove active class from links and hide sections
         navItems.forEach(item => item.classList.remove('active'));
         viewSections.forEach(section => section.classList.add('hide'));
         
-        // Find matching view container and show it
-        const targetViewId = `${hash.slice(1)}-view`;
+        // Find matching view container
+        let targetViewId = '';
+        if (hash === '#reel-studio') {
+            targetViewId = 'reel-studio-view';
+        } else {
+            targetViewId = `${hash.slice(1)}-view`;
+        }
+        
         const targetSection = document.getElementById(targetViewId);
-        const targetNavLink = document.getElementById(`nav-${hash.slice(1)}`);
+        let navId = `nav-${hash.slice(1)}`;
+        if (hash === '#reel-studio') navId = 'nav-reel-studio';
+        const targetNavLink = document.getElementById(navId);
         
         if (targetSection && targetNavLink) {
             targetSection.classList.remove('hide');
             targetNavLink.classList.add('active');
             window.scrollTo(0, 0);
         } else {
-            // Fallback to Dashboard
             document.getElementById('dashboard-view').classList.remove('hide');
             document.getElementById('nav-dashboard').classList.add('active');
         }
 
-        // Close drawer if route changes
         closeDrawer();
     }
 
-    // Bind events
     window.addEventListener('hashchange', handleRouting);
     
-    // Quick tags filling input
+    // Quick tags
     quickTags.forEach(tag => {
         tag.addEventListener('click', () => {
             nicheInput.value = tag.getAttribute('data-topic');
@@ -256,132 +231,143 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 2. WORKFLOW WIZARD CONTROLLER
+    // 2. TWO-STAGE WORKFLOW ENGINE
     // ==========================================
+    
+    // Agent Monitor status updates
+    function setAgentStatus(agentIndex, status) {
+        // status is 'waiting', 'running', 'completed', 'failed'
+        const row = document.getElementById(`monitor-agent-${agentIndex}`);
+        if (!row) return;
+        const tag = row.querySelector('.agent-status-tag');
+        
+        tag.className = `agent-status-tag ${status}`;
+        tag.innerText = status;
+    }
+
+    function resetAgentMonitor() {
+        for (let i = 1; i <= 8; i++) {
+            setAgentStatus(i, 'waiting');
+        }
+    }
+
+    // STAGE 1: Generate Ideas
     generateBtn.addEventListener('click', () => {
-        const topic = nicheInput.value.trim() || "Technology";
-        runWizardPipeline(topic);
+        const topic = nicheInput.value.trim() || "Creator Economy";
+        activeNiche = topic;
+        runStage1Pipeline(topic);
     });
 
     nicheInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            const topic = nicheInput.value.trim() || "Technology";
-            runWizardPipeline(topic);
+            const topic = nicheInput.value.trim() || "Creator Economy";
+            activeNiche = topic;
+            runStage1Pipeline(topic);
         }
     });
 
-    function runWizardPipeline(niche) {
-        // Reset and display wizard overlay
+    function runStage1Pipeline(niche) {
         wizardModal.classList.remove('hide');
         wizardProgressBar.style.width = '0%';
         resetWizardSteps();
+        resetAgentMonitor();
         
-        // Trigger fetch API
-        const apiPromise = fetch('/api/generate', {
+        // Stage 1 Endpoint
+        const apiPromise = fetch('/api/generate-ideas', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ topic: niche })
         }).then(res => {
-            if (!res.ok) throw new Error("API call failed");
+            if (!res.ok) throw new Error("Stage 1 failed");
             return res.json();
         });
 
-        executeStepAnimationChain(apiPromise);
+        executeStage1Animations(apiPromise);
     }
 
     function resetWizardSteps() {
-        for (let i = 1; i <= 6; i++) {
+        for (let i = 1; i <= 8; i++) {
             const node = document.getElementById(`wstep-${i}`);
             node.classList.remove('active', 'done');
             node.querySelector('.spinner-mini').classList.add('hide');
             node.querySelector('.check-icon').classList.add('hide');
         }
-        // Step 1 active first
-        const step1 = document.getElementById('wstep-1');
-        step1.classList.add('active');
-        step1.querySelector('.spinner-mini').classList.remove('hide');
     }
 
-    async function executeStepAnimationChain(apiPromise) {
-        const stepTimings = [1000, 1200, 1200, 800, 800, 1000];
+    async function executeStage1Animations(apiPromise) {
+        const stepTimings = [1000, 1200, 1200];
         const statusPhrases = [
-            "Registering niche topic parameters...",
-            "Crawling RSS feeds and subreddits...",
-            "Scoring harvested trends using RandomForest...",
-            "Writing short-form video scripts via Gemini...",
-            "Drafting LinkedIn post and Instagram caption copywriting...",
-            "Predicting final virality index using XGBoost..."
+            "Agent 1: Scanning RSS feeds and Reddit indices...",
+            "Agent 2: Scoring metrics via RandomForest weights...",
+            "Agent 3: Generating viral content idea options..."
         ];
 
-        for (let i = 1; i <= 6; i++) {
+        // Step 1 active
+        activateWizardStepNode(1);
+        setAgentStatus(1, 'running');
+
+        for (let i = 1; i <= 3; i++) {
             wizardGlobalStatus.innerText = statusPhrases[i-1];
-            
-            // Wait for step timer
             await new Promise(resolve => setTimeout(resolve, stepTimings[i-1]));
             
             // Mark step i as done
-            const currentStep = document.getElementById(`wstep-${i}`);
-            currentStep.classList.remove('active');
-            currentStep.classList.add('done');
-            currentStep.querySelector('.spinner-mini').classList.add('hide');
-            currentStep.querySelector('.check-icon').classList.remove('hide');
+            completeWizardStepNode(i);
+            setAgentStatus(i, 'completed');
+            wizardProgressBar.style.width = `${Math.round((i / 8) * 100)}%`;
             
-            // Update progress bar
-            wizardProgressBar.style.width = `${Math.round((i / 6) * 100)}%`;
-            
-            // Set next step active
-            if (i < 6) {
-                const nextStep = document.getElementById(`wstep-${i+1}`);
-                nextStep.classList.add('active');
-                nextStep.querySelector('.spinner-mini').classList.remove('hide');
+            if (i < 3) {
+                activateWizardStepNode(i+1);
+                setAgentStatus(i+1, 'running');
             }
         }
 
         try {
             const data = await apiPromise;
-            generatedData = data;
+            generatedIdeasPayload = data;
             
-            // Populate all data fields
-            populateWorkspace(data);
+            // Populate Stage 1 outputs
+            populateStage1Outputs(data);
             
-            // Transition out wizard
+            // Hide wizard, open Content Studio Ideas
             setTimeout(() => {
                 wizardModal.classList.add('hide');
-                showToast("SaaS Blueprint generated! Explore Trends, Content Studio & Analytics.");
-            }, 500);
+                window.location.hash = '#content-studio';
+                showToast("Content ideas generated! Click on a card below to compile assets.");
+            }, 400);
 
         } catch (err) {
             console.error(err);
             wizardModal.classList.add('hide');
-            alert("Generation failed. Check that the FastAPI server is running.");
+            alert("Error in Stage 1 content discovery. Check backend connection.");
         }
     }
 
-    // ==========================================
-    // 3. WORKSPACE POPULATION ENGINE
-    // ==========================================
-    function populateWorkspace(data) {
-        // Update Dashboard Stat Cards
+    function activateWizardStepNode(index) {
+        const card = document.getElementById(`wstep-${index}`);
+        card.classList.add('active');
+        card.querySelector('.spinner-mini').classList.remove('hide');
+    }
+
+    function completeWizardStepNode(index) {
+        const card = document.getElementById(`wstep-${index}`);
+        card.classList.remove('active');
+        card.classList.add('done');
+        card.querySelector('.spinner-mini').classList.add('hide');
+        card.querySelector('.check-icon').classList.remove('hide');
+    }
+
+    function populateStage1Outputs(data) {
+        // Update Dashboard Stats
         document.getElementById('stat-total-trends').innerText = data.trends.length;
-        
-        // Average trend score
         const avgTrendScore = (data.trends.reduce((sum, item) => sum + item.score, 0) / data.trends.length).toFixed(1);
         document.getElementById('stat-avg-trend-score').innerText = `${avgTrendScore}`;
         
-        // Virality score
-        const viralityVal = Math.round(data.virality.virality_score);
-        document.getElementById('stat-avg-virality-score').innerText = `${viralityVal}%`;
-        document.getElementById('stat-content-count').innerText = "3 Assets";
-
-        // Update Trends Grid
+        // Populate Trends Cards Grid
         trendsCardsContainer.innerHTML = '';
         data.trends.forEach((item, index) => {
             const isWinner = index === 0;
             const card = document.createElement('div');
             card.className = `glassmorphism trend-card ${isWinner ? 'top-winner-card' : ''}`;
-            
             card.innerHTML = `
                 <div class="trend-card-left">
                     <div class="trend-card-source-row">
@@ -396,20 +382,140 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="trend-card-score-val">${item.score}</span>
                 </div>
             `;
-            
-            // Add click details handler
-            card.addEventListener('click', () => {
-                openSidePanel(item);
-            });
-            
+            card.addEventListener('click', () => openSidePanel(item));
             trendsCardsContainer.appendChild(card);
         });
+
+        // Populate Content Ideas list
+        ideasContainer.innerHTML = '';
+        data.ideas.forEach((idea, index) => {
+            const card = document.createElement('div');
+            card.className = "idea-card-item";
+            card.innerHTML = `
+                <div class="idea-card-left">
+                    <h4 class="idea-card-title">${idea.title}</h4>
+                    <span class="idea-card-audience"><i data-lucide="users" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Audience: ${idea.target_audience}</span>
+                </div>
+                <div class="idea-card-right">
+                    <span class="idea-badge virality">Virality: ${idea.virality_potential}</span>
+                    <span class="idea-badge engagement">Engagement: ${idea.estimated_engagement}</span>
+                    <button class="idea-select-btn">Select Idea</button>
+                </div>
+            `;
+            
+            // Selection event triggers Stage 2
+            card.querySelector('.idea-select-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Toggle select UI
+                document.querySelectorAll('.idea-card-item').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                
+                runStage2Pipeline(idea);
+            });
+
+            ideasContainer.appendChild(card);
+        });
         
-        // Update Content Studio inputs
-        // Tab 1: Reel
+        lucide.createIcons();
+    }
+
+    // STAGE 2: Generate script, Reel Studio, social copies, virality prediction
+    function runStage2Pipeline(selectedIdea) {
+        wizardModal.classList.remove('hide');
+        // Resume progress from 37.5% (3/8 completed)
+        wizardProgressBar.style.width = '37.5%';
+        
+        // Complete nodes 1-3
+        for (let i = 1; i <= 3; i++) {
+            const node = document.getElementById(`wstep-${i}`);
+            node.classList.add('done');
+            node.querySelector('.check-icon').classList.remove('hide');
+            setAgentStatus(i, 'completed');
+        }
+
+        // Call Stage 2 API
+        const apiPromise = fetch('/api/generate-assets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                niche: activeNiche,
+                selected_trend: generatedIdeasPayload.top_trend,
+                selected_idea: selectedIdea
+            })
+        }).then(res => {
+            if (!res.ok) throw new Error("Stage 2 failed");
+            return res.json();
+        });
+
+        executeStage2Animations(apiPromise, selectedIdea);
+    }
+
+    async function executeStage2Animations(apiPromise, selectedIdea) {
+        const stepTimings = [800, 1000, 800, 800, 1000];
+        const statusPhrases = [
+            "Agent 4: Writing vertical script via Gemini...",
+            "Agent 5: Building scene timelines and thumbnail layouts...",
+            "Agent 6: Structuring LinkedIn professional post...",
+            "Agent 7: Framing Instagram feed hashtags...",
+            "Agent 8: Running virality prediction index on XGBoost..."
+        ];
+
+        for (let i = 4; i <= 8; i++) {
+            wizardGlobalStatus.innerText = statusPhrases[i-4];
+            activateWizardStepNode(i);
+            setAgentStatus(i, 'running');
+            
+            await new Promise(resolve => setTimeout(resolve, stepTimings[i-4]));
+            
+            completeWizardStepNode(i);
+            setAgentStatus(i, 'completed');
+            wizardProgressBar.style.width = `${Math.round((i / 8) * 100)}%`;
+        }
+
+        try {
+            const assets = await apiPromise;
+            
+            // Combine data payloads
+            generatedData = {
+                niche: activeNiche,
+                top_trend: generatedIdeasPayload.top_trend,
+                ideas: generatedIdeasPayload.ideas,
+                selected_idea: selectedIdea,
+                script: assets.script,
+                reel_studio: assets.reel_studio,
+                linkedin: assets.linkedin,
+                instagram: assets.instagram,
+                virality: assets.virality
+            };
+
+            // Populate Stage 2 views
+            populateStage2Outputs(generatedData);
+            
+            setTimeout(() => {
+                wizardModal.classList.add('hide');
+                // Auto route to Content Studio Script tab so they see what they generated
+                window.location.hash = '#content-studio';
+                // Activate Script tab
+                document.getElementById('tab-reel').click();
+                showToast("Automated Creator Package completed successfully!");
+            }, 400);
+
+        } catch (err) {
+            console.error(err);
+            wizardModal.classList.add('hide');
+            alert("Error compiling campaign assets.");
+        }
+    }
+
+    function populateStage2Outputs(data) {
+        // Average virality score
+        const viralityScore = Math.round(data.virality.virality_score);
+        document.getElementById('stat-avg-virality-score').innerText = `${viralityScore}%`;
+        document.getElementById('stat-content-count').innerText = "4 Assets";
+
+        // Tab 1: Script
         document.getElementById('studio-script-hook').innerText = `"${data.script.hook}"`;
         document.getElementById('studio-script-story').innerText = `"${data.script.story}"`;
-        
         const insightsUl = document.getElementById('studio-script-insights');
         insightsUl.innerHTML = '';
         data.script.insights.forEach(insight => {
@@ -429,8 +535,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('studio-instagram-hashtags').innerText = data.instagram.hashtags;
         document.getElementById('studio-instagram-cta').innerText = `📌 CTA: ${data.instagram.cta}`;
 
-        // Update Analytics elements
-        document.getElementById('virality-percentage').innerText = `${viralityVal}%`;
+        // Populate Reel Studio Panel
+        rstudioVoiceover.innerText = data.reel_studio.voiceover_script;
+        rstudioThumbnail.innerText = data.reel_studio.thumbnail_prompt;
+        rstudioBroll.innerText = data.reel_studio.b_roll_suggestions;
+
+        // Populate Vertical Storyboard Timeline
+        rstudioTimeline.innerHTML = '';
+        data.reel_studio.scenes.forEach(scene => {
+            const card = document.createElement('div');
+            card.className = "timeline-scene-card";
+            card.innerHTML = `
+                <div class="timeline-scene-node-dot"></div>
+                <div class="timeline-scene-header">
+                    <span class="timeline-scene-title">${scene.title}</span>
+                    <span class="timeline-scene-duration">${scene.duration}</span>
+                </div>
+                <div class="timeline-scene-detail-row">
+                    <div class="timeline-scene-group">
+                        <span class="timeline-scene-lbl">Visual Asset Prompt</span>
+                        <p class="timeline-scene-text">${scene.visual_prompt}</p>
+                    </div>
+                    <div class="timeline-scene-group">
+                        <span class="timeline-scene-lbl">B-Roll Footage suggestion</span>
+                        <p class="timeline-scene-text">${scene.b_roll}</p>
+                    </div>
+                    <div class="timeline-scene-group">
+                        <span class="timeline-scene-lbl">Subtitle Content overlay</span>
+                        <p class="timeline-scene-text subtitle-text">"${scene.subtitle}"</p>
+                    </div>
+                </div>
+            `;
+            rstudioTimeline.appendChild(card);
+        });
+
+        // Populate Analytics elements
+        document.getElementById('virality-percentage').innerText = `${viralityScore}%`;
         document.getElementById('metric-views').innerText = formatCounter(data.virality.expected_views);
         document.getElementById('metric-likes').innerText = formatCounter(data.virality.expected_likes);
         document.getElementById('metric-shares').innerText = formatCounter(data.virality.expected_shares);
@@ -439,18 +579,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const verdictLbl = document.getElementById('status-verdict');
         const verdictDot = verdictLbl.previousElementSibling;
         
-        if (viralityVal >= 80) {
+        if (viralityScore >= 80) {
             verdictLbl.innerText = "Highly Viral Potential";
             verdictLbl.style.color = "#10b981";
             verdictDot.style.backgroundColor = "#10b981";
-        } else if (viralityVal >= 60) {
+        } else if (viralityScore >= 60) {
             verdictLbl.innerText = "Moderate Viral Potential";
             verdictLbl.style.color = "#f59e0b";
             verdictDot.style.backgroundColor = "#f59e0b";
         } else {
             verdictLbl.innerText = "Low Viral Potential";
-            verdictLbl.style.color = "#ec4899";
-            verdictDot.style.backgroundColor = "#ec4899";
+            verdictLbl.style.color = "#red";
+            verdictDot.style.backgroundColor = "#red";
         }
 
         // Render Charts
@@ -460,15 +600,81 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     }
 
-    // Helper views formatter
-    function formatCounter(num) {
-        if (num >= 1000000) {
-            return (num / 1000000).toFixed(1) + 'M';
+    // ==========================================
+    // 3. HACKATHON DEMO MODE SIMULATION
+    // ==========================================
+    demoBtn.addEventListener('click', runHackathonDemoMode);
+
+    async function runHackathonDemoMode() {
+        console.log("Launching automated demo mode...");
+        
+        // Reset navigation back to Dashboard
+        window.location.hash = '#dashboard';
+        resetAgentMonitor();
+        
+        // Trigger modal overlay
+        wizardModal.classList.remove('hide');
+        wizardProgressBar.style.width = '0%';
+        resetWizardSteps();
+        
+        const stepTimings = [1200, 1000, 1400, 900, 900, 800, 800, 1000];
+        const statusPhrases = [
+            "Demo Mode - Agent 1: Crawling daily technology newsletters & r/startups...",
+            "Demo Mode - Agent 2: Sorting RandomForest ranking metrics...",
+            "Demo Mode - Agent 3: Brainstorming content ideas cards...",
+            "Demo Mode - Agent 4: Writing hook and Insights scripts...",
+            "Demo Mode - Agent 5: Layouting scene production boards...",
+            "Demo Mode - Agent 6: Optimization of LinkedIn copy text...",
+            "Demo Mode - Agent 7: Tagging Instagram captions and CTAs...",
+            "Demo Mode - Agent 8: Simulating XGBoost virality forecasting model..."
+        ];
+
+        // Animate all 8 steps sequentially, updating the Dashboard monitor rows
+        for (let i = 1; i <= 8; i++) {
+            wizardGlobalStatus.innerText = statusPhrases[i-1];
+            activateWizardStepNode(i);
+            setAgentStatus(i, 'running');
+            
+            await new Promise(resolve => setTimeout(resolve, stepTimings[i-1]));
+            
+            completeWizardStepNode(i);
+            setAgentStatus(i, 'completed');
+            wizardProgressBar.style.width = `${Math.round((i / 8) * 100)}%`;
+            
+            // Special middle transition: when Agent 3 finishes, simulate selecting an Idea!
+            if (i === 3) {
+                wizardGlobalStatus.innerText = "Demo Mode - System: Automatically selecting winning content idea...";
+                // Load Stage 1 outputs
+                generatedIdeasPayload = {
+                    trends: demoData.trends,
+                    top_trend: demoData.top_trend,
+                    ideas: demoData.ideas
+                };
+                populateStage1Outputs(generatedIdeasPayload);
+                
+                // Visual delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
         }
-        if (num >= 1000) {
-            return (num / 1000).toFixed(1) + 'K';
-        }
-        return num.toString();
+
+        // Save demoData in memory
+        generatedData = demoData;
+        
+        // Populate all views
+        populateStage2Outputs(demoData);
+        
+        // Select the second card visually in Content Studio
+        setTimeout(() => {
+            const secondCard = document.querySelectorAll('.idea-card-item')[1];
+            if (secondCard) secondCard.classList.add('selected');
+        }, 1000);
+
+        // Close wizard modal and route directly to Analytics
+        setTimeout(() => {
+            wizardModal.classList.add('hide');
+            window.location.hash = '#analytics';
+            showToast("Hackathon Demo complete! Panning analytics dashboard.");
+        }, 600);
     }
 
     // ==========================================
@@ -486,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="drawer-metric-lbl">Growth Velocity</span>
                     <div class="drawer-metric-right">
                         <div class="drawer-metric-bar">
-                            <div class="drawer-metric-bar-fill bar-purple" style="width: ${trend.growth_velocity}%; background-color: var(--purple);"></div>
+                            <div class="drawer-metric-bar-fill" style="width: ${trend.growth_velocity}%; background-color: var(--purple);"></div>
                         </div>
                         <span class="drawer-metric-val">${trend.growth_velocity}%</span>
                     </div>
@@ -496,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="drawer-metric-lbl">Novelty index</span>
                     <div class="drawer-metric-right">
                         <div class="drawer-metric-bar">
-                            <div class="drawer-metric-bar-fill bar-blue" style="width: ${trend.novelty}%; background-color: var(--blue);"></div>
+                            <div class="drawer-metric-bar-fill" style="width: ${trend.novelty}%; background-color: var(--blue);"></div>
                         </div>
                         <span class="drawer-metric-val">${trend.novelty}%</span>
                     </div>
@@ -506,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="drawer-metric-lbl">Engagement Potential</span>
                     <div class="drawer-metric-right">
                         <div class="drawer-metric-bar">
-                            <div class="drawer-metric-bar-fill bar-cyan" style="style: width: ${trend.engagement_potential}%; background-color: var(--cyan);"></div>
+                            <div class="drawer-metric-bar-fill" style="width: ${trend.engagement_potential}%; background-color: var(--cyan);"></div>
                         </div>
                         <span class="drawer-metric-val">${trend.engagement_potential}%</span>
                     </div>
@@ -516,7 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="drawer-metric-lbl">Audience Relevance</span>
                     <div class="drawer-metric-right">
                         <div class="drawer-metric-bar">
-                            <div class="drawer-metric-bar-fill bar-pink" style="width: ${trend.audience_relevance}%; background-color: var(--pink);"></div>
+                            <div class="drawer-metric-bar-fill" style="width: ${trend.audience_relevance}%; background-color: var(--pink);"></div>
                         </div>
                         <span class="drawer-metric-val">${trend.audience_relevance}%</span>
                     </div>
@@ -566,7 +772,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeTab = document.querySelector('.studio-tab-item.active').getAttribute('id');
         let textToCopy = '';
         
-        if (activeTab === 'tab-reel') {
+        if (activeTab === 'tab-ideas') {
+            textToCopy = generatedData.ideas.map((id, index) => `${index+1}. ${id.title} (${id.target_audience})`).join('\n');
+        } else if (activeTab === 'tab-reel') {
             textToCopy = `HOOK: ${generatedData.script.hook}\nSTORY: ${generatedData.script.story}\nINSIGHTS:\n- ${generatedData.script.insights.join('\n- ')}\nCTA: ${generatedData.script.cta}`;
         } else if (activeTab === 'tab-linkedin') {
             textToCopy = `${generatedData.linkedin.post}\n\n${generatedData.linkedin.hashtags}\n\n${generatedData.linkedin.engagement_hook}`;
@@ -588,13 +796,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Copy Thumbnail Prompt
+    copyThumbPromptBtn.addEventListener('click', () => {
+        if (!generatedData) return;
+        navigator.clipboard.writeText(generatedData.reel_studio.thumbnail_prompt).then(() => {
+            copyThumbPromptBtn.classList.add('copied');
+            const originalHTML = copyThumbPromptBtn.innerHTML;
+            copyThumbPromptBtn.innerHTML = '<i data-lucide="check"></i> Copied!';
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                copyThumbPromptBtn.classList.remove('copied');
+                copyThumbPromptBtn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }, 2000);
+        });
+    });
+
     // Studio regenerate blueprint
     regenStudioBtn.addEventListener('click', () => {
         if (!generatedData) return;
-        runWizardPipeline(generatedData.niche);
+        runStage1Pipeline(generatedData.niche);
     });
 
-    // Studio report export (.md)
+    // Studio report export (.md) - EXPANDED CREATOR PACKAGE
     exportStudioBtn.addEventListener('click', () => {
         if (!generatedData) return;
 
@@ -602,13 +827,21 @@ document.addEventListener('DOMContentLoaded', () => {
             year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        const report = `# Ratefluencer AI - Campaign Content blueprint
+        const report = `# Ratefluencer AI - Campaign Content blueprint (Creator Package)
 Generated: ${dateStr}
 Topic / Niche: **${generatedData.niche}**
 
 ---
 
-## 1. Top Content Script (Vertical Reels)
+## 1. Selected Content Idea
+- **Selected Idea Title**: "${generatedData.selected_idea.title}"
+- **Target Audience Profile**: ${generatedData.selected_idea.target_audience}
+- **Estimated Engagement**: ${generatedData.selected_idea.estimated_engagement}
+- **Virality Potential**: ${generatedData.selected_idea.virality_potential}
+
+---
+
+## 2. Short-Form Video Script
 - **Hook**: "${generatedData.script.hook}"
 - **Story Body**: "${generatedData.script.story}"
 - **Key Takeaways**:
@@ -617,7 +850,27 @@ ${generatedData.script.insights.map((ins, i) => `  ${i+1}. ${ins}`).join('\n')}
 
 ---
 
-## 2. LinkedIn Post
+## 3. Automated Reel Studio storyboard
+- **Thumbnail Cover Prompt**: 
+  *"${generatedData.reel_studio.thumbnail_prompt}"*
+
+- **Voiceover Narration Script**: 
+  *"${generatedData.reel_studio.voiceover_script}"*
+
+- **B-Roll Suggestions**: 
+  *"${generatedData.reel_studio.b_roll_suggestions}"*
+
+- **Scene-by-Scene Timeline Breakdown**:
+${generatedData.reel_studio.scenes.map(s => `
+### Scene ${s.scene_number} (${s.duration}) - ${s.title}
+- **Visual Asset Prompt**: ${s.visual_prompt}
+- **B-Roll Footage suggestion**: ${s.b_roll}
+- **Subtitle content overlay**: "${s.subtitle}"
+`).join('\n')}
+
+---
+
+## 4. LinkedIn Native Post
 \`\`\`text
 ${generatedData.linkedin.post}
 
@@ -627,7 +880,7 @@ ${generatedData.linkedin.engagement_hook}
 
 ---
 
-## 3. Instagram Caption
+## 5. Instagram Feed Caption
 \`\`\`text
 ${generatedData.instagram.caption}
 
@@ -637,7 +890,7 @@ ${generatedData.instagram.cta}
 
 ---
 
-## 4. Virality Prediction Overview
+## 6. XGBoost Virality Prediction report
 - **Predicted Virality Score**: ${generatedData.virality.virality_score}%
 - **Expected Reach Profile**:
   - Expected Views: ${generatedData.virality.expected_views.toLocaleString()}
@@ -650,13 +903,13 @@ ${generatedData.instagram.cta}
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `ratefluencer_campaign_${generatedData.niche.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.md`);
+        link.setAttribute('download', `ratefluencer_creator_package_${generatedData.niche.toLowerCase().replace(/[^a-z0-9]+/g, '_')}.md`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
-        showToast("Report download initialized!");
+        showToast("Creator Package downloaded!");
     });
 
     function showToast(msg) {
@@ -676,7 +929,7 @@ ${generatedData.instagram.cta}
         if (lineChartInstance) lineChartInstance.destroy();
         if (barChartInstance) barChartInstance.destroy();
 
-        // 6a. Virality Score gauge donut
+        // Donut gauge
         const score = Math.round(viralityData.virality_score);
         const gaugeCtx = document.getElementById('viralityGaugeChart').getContext('2d');
         
@@ -701,7 +954,7 @@ ${generatedData.instagram.cta}
             }
         });
 
-        // 6b. Line Chart for projected engagement
+        // Projected engagement curve
         const lineCtx = document.getElementById('engagementLineChart').getContext('2d');
         const labels = viralityData.hourly_engagement.map(h => h.hour);
         const views = viralityData.hourly_engagement.map(h => h.views);
@@ -756,7 +1009,7 @@ ${generatedData.instagram.cta}
             }
         });
 
-        // 6c. Horizontal Bar Chart for Platform performance reach
+        // Reach bar chart
         const barCtx = document.getElementById('platformReachBarChart').getContext('2d');
         const platforms = viralityData.platform_performance.map(p => p.platform);
         const reachValues = viralityData.platform_performance.map(p => p.expected_reach);
@@ -795,8 +1048,20 @@ ${generatedData.instagram.cta}
     // Initialize Router
     handleRouting();
 
-    // Load Demo Data Immediately (Prevents empty pages, ensuring premium layout on load)
+    // Load Demo Data Immediately
     generatedData = demoData;
-    populateWorkspace(demoData);
+    generatedIdeasPayload = {
+        trends: demoData.trends,
+        top_trend: demoData.top_trend,
+        ideas: demoData.ideas
+    };
+    populateStage1Outputs(demoData);
+    populateStage2Outputs(demoData);
+    
+    // Select the second card visually in Content Studio on load
+    setTimeout(() => {
+        const cards = document.querySelectorAll('.idea-card-item');
+        if (cards && cards[1]) cards[1].classList.add('selected');
+    }, 1200);
 
 });
