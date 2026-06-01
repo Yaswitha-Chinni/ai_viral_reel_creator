@@ -33,14 +33,8 @@
                 <a href="#content-studio" class="nav-item" id="nav-studio"><i data-lucide="clapperboard"></i> Content Studio</a>
                 <a href="#analytics" class="nav-item" id="nav-analytics"><i data-lucide="bar-chart-3"></i> Analytics</a>
             </nav>
-            <div class="user-profile-section" id="profile-btn">
-                <div class="profile-avatar">
-                    <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=yaswitha" alt="User Profile Avatar" class="avatar-img">
-                </div>
-                <div class="profile-info">
-                    <span class="profile-name">Yaswitha</span>
-                    <span class="profile-tier">Pro Member</span>
-                </div>
+            <div style="width: 120px; display: flex; justify-content: flex-end;">
+                <span class="pro-tag">HACKATHON v1.0</span>
             </div>
         </div>
     </header>
@@ -48,132 +42,78 @@
     <!-- Main Container -->
     <main class="container">
         
-        <!-- Hero Section -->
-        <section class="hero-section" id="hero-area">
-            <div class="hero-content">
-                <h1 class="hero-title">Create Viral Content <br><span class="gradient-text">With Autonomous AI</span></h1>
-                <p class="hero-subtitle">Discover trends, rank potential, generate high-retention reel scripts, and predict cross-platform engagement in seconds.</p>
-                
-                <!-- Search Console -->
-                <div class="search-console-wrapper glassmorphism">
-                    <div class="search-input-container">
-                        <i data-lucide="search" class="search-icon"></i>
-                        <input type="text" id="niche-input" placeholder="Enter your niche, topic, or industry keywords (e.g. AI, Venture Capital)..." aria-label="Niche Topic Input">
+        <!-- ==========================================
+             1. DASHBOARD VIEW
+             ========================================== -->
+        <section id="dashboard-view" class="view-section">
+            <div class="hero-section" id="hero-area">
+                <div class="hero-content">
+                    <h1 class="hero-title">Create Viral Content <br><span class="gradient-text">With Autonomous AI</span></h1>
+                    <p class="hero-subtitle">Discover trends, generate reels, predict virality and publish faster.</p>
+                    
+                    <!-- Search Console -->
+                    <div class="search-console-wrapper glassmorphism">
+                        <div class="search-input-container">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="niche-input" placeholder="Enter niche or topic (e.g. AI, Startups, Creator Economy)..." aria-label="Niche Topic Input">
+                        </div>
+                        <button class="generate-btn" id="generate-button">
+                            <span class="btn-text">Generate Blueprint</span>
+                            <i data-lucide="sparkles" class="sparkle-icon"></i>
+                        </button>
                     </div>
-                    <button class="generate-btn" id="generate-button">
-                        <span class="btn-text">Generate Blueprint</span>
-                        <i data-lucide="sparkles" class="sparkle-icon"></i>
-                    </button>
-                </div>
 
-                <!-- Examples / Quick Tags -->
-                <div class="quick-examples">
-                    <span class="examples-label">Try searching:</span>
-                    <div class="examples-tags">
-                        <button class="tag-btn" id="tag-ai" data-topic="Artificial Intelligence">Artificial Intelligence</button>
-                        <button class="tag-btn" id="tag-startups" data-topic="Startups & SaaS">Startups & SaaS</button>
-                        <button class="tag-btn" id="tag-technology" data-topic="Next-Gen Technology">Next-Gen Tech</button>
-                        <button class="tag-btn" id="tag-finance" data-topic="Personal Finance">Personal Finance</button>
-                        <button class="tag-btn" id="tag-creator" data-topic="Creator Economy">Creator Economy</button>
+                    <!-- Examples / Quick Tags -->
+                    <div class="quick-examples">
+                        <span class="examples-label">Try searching:</span>
+                        <div class="examples-tags">
+                            <button class="tag-btn" id="tag-ai" data-topic="AI">AI</button>
+                            <button class="tag-btn" id="tag-startups" data-topic="Startups">Startups</button>
+                            <button class="tag-btn" id="tag-technology" data-topic="Technology">Technology</button>
+                            <button class="tag-btn" id="tag-finance" data-topic="Finance">Finance</button>
+                            <button class="tag-btn" id="tag-creator" data-topic="Creator Economy">Creator Economy</button>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Loading State Console -->
-        <section class="loading-console-wrapper glassmorphism hide" id="loading-console">
-            <div class="loading-header">
-                <div class="loading-pulse-indicator"></div>
-                <div class="loading-title-group">
-                    <h3>Orchestrating AI Workflow Agents</h3>
-                    <p class="agent-subtitle">Parsing live sources, executing inference models, and copywriting script boards...</p>
                 </div>
             </div>
 
-            <!-- Pipeline Visualizer -->
-            <div class="agent-steps-grid">
-                <div class="agent-step-card active" id="step-loading-1">
-                    <div class="step-card-status">
-                        <div class="spinner-mini"></div>
-                        <i data-lucide="check-circle" class="check-icon hide"></i>
-                    </div>
-                    <div class="step-card-detail">
-                        <span class="step-num">Agent Node 1</span>
-                        <h4>Discovering Trends</h4>
-                        <p class="step-desc">Parsing RSS Feeds & Subreddits...</p>
+            <!-- Quick Stats Panel -->
+            <div class="quick-stats-grid">
+                <div class="glassmorphism stat-card">
+                    <div class="stat-icon-wrapper purple"><i data-lucide="compass"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Total Trends Found</span>
+                        <h2 class="stat-value" id="stat-total-trends">10</h2>
                     </div>
                 </div>
-
-                <div class="agent-step-card" id="step-loading-2">
-                    <div class="step-card-status">
-                        <div class="spinner-mini hide"></div>
-                        <i data-lucide="check-circle" class="check-icon hide"></i>
-                    </div>
-                    <div class="step-card-detail">
-                        <span class="step-num">Agent Node 2</span>
-                        <h4>Ranking Trends</h4>
-                        <p class="step-desc">Running RandomForest Regressor...</p>
+                <div class="glassmorphism stat-card">
+                    <div class="stat-icon-wrapper blue"><i data-lucide="award"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Average Trend Score</span>
+                        <h2 class="stat-value" id="stat-avg-trend-score">82.4</h2>
                     </div>
                 </div>
-
-                <div class="agent-step-card" id="step-loading-3">
-                    <div class="step-card-status">
-                        <div class="spinner-mini hide"></div>
-                        <i data-lucide="check-circle" class="check-icon hide"></i>
-                    </div>
-                    <div class="step-card-detail">
-                        <span class="step-num">Agent Node 3</span>
-                        <h4>Generating Reel</h4>
-                        <p class="step-desc">Drafting hook & story metrics...</p>
+                <div class="glassmorphism stat-card">
+                    <div class="stat-icon-wrapper cyan"><i data-lucide="trending-up"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Average Virality Score</span>
+                        <h2 class="stat-value" id="stat-avg-virality-score">87%</h2>
                     </div>
                 </div>
-
-                <div class="agent-step-card" id="step-loading-4">
-                    <div class="step-card-status">
-                        <div class="spinner-mini hide"></div>
-                        <i data-lucide="check-circle" class="check-icon hide"></i>
-                    </div>
-                    <div class="step-card-detail">
-                        <span class="step-num">Agent Node 4</span>
-                        <h4>LinkedIn Post</h4>
-                        <p class="step-desc">Optimizing professional copy...</p>
-                    </div>
-                </div>
-
-                <div class="agent-step-card" id="step-loading-5">
-                    <div class="step-card-status">
-                        <div class="spinner-mini hide"></div>
-                        <i data-lucide="check-circle" class="check-icon hide"></i>
-                    </div>
-                    <div class="step-card-detail">
-                        <span class="step-num">Agent Node 5</span>
-                        <h4>Instagram Caption</h4>
-                        <p class="step-desc">Tailoring engaging visuals...</p>
-                    </div>
-                </div>
-
-                <div class="agent-step-card" id="step-loading-6">
-                    <div class="step-card-status">
-                        <div class="spinner-mini hide"></div>
-                        <i data-lucide="check-circle" class="check-icon hide"></i>
-                    </div>
-                    <div class="step-card-detail">
-                        <span class="step-num">Agent Node 6</span>
-                        <h4>Virality Prediction</h4>
-                        <p class="step-desc">Evaluating via XGBoost model...</p>
+                <div class="glassmorphism stat-card">
+                    <div class="stat-icon-wrapper pink"><i data-lucide="copy"></i></div>
+                    <div class="stat-data">
+                        <span class="stat-label">Generated Content Count</span>
+                        <h2 class="stat-value" id="stat-content-count">3 Assets</h2>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Main Workspace (Hidden by default, shown when content generated) -->
-        <section class="main-dashboard-grid hide" id="main-dashboard">
-            
             <!-- AI Workflow Visualization Flow (Pipeline Node Map) -->
-            <div class="pipeline-flow-wrapper glassmorphism col-span-full">
+            <div class="pipeline-flow-wrapper glassmorphism">
                 <div class="panel-header">
-                    <h3 class="panel-title"><i data-lucide="git-branch" class="title-icon icon-purple"></i> AI Agent Pipeline Data Flow</h3>
-                    <p class="panel-subtitle">Visual workflow showing real-time execution outputs moving through downstream agent nodes.</p>
+                    <h3 class="panel-title"><i data-lucide="git-branch" class="title-icon icon-purple"></i> AI Agent Pipeline Flow</h3>
+                    <p class="panel-subtitle">Sequential execution data path of our autonomous content creation workspace.</p>
                 </div>
                 <div class="pipeline-visual-nodes">
                     <div class="pipeline-node active" id="pnode-1">
@@ -202,213 +142,324 @@
                     </div>
                     <div class="pnode-arrow-line"><div class="arrow-pulse"></div></div>
                     <div class="pipeline-node active" id="pnode-6">
-                        <div class="pnode-dot"><i data-lucide="trending-up"></i></div>
+                        <div class="pnode-dot"><i data-lucide="bar-chart-3"></i></div>
                         <div class="pnode-label">XGBoost Virality</div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- COLUMN 1: TREND INTELLIGENCE -->
-            <div class="grid-col flex-column">
-                
-                <!-- STEP 1: Trend Discovery Panel -->
-                <div class="glassmorphism content-card flex-grow" id="panel-step1">
-                    <div class="panel-header">
-                        <span class="badge badge-purple">Step 1</span>
-                        <h3 class="panel-title"><i data-lucide="compass" class="title-icon"></i> Trend Discovery</h3>
-                        <p class="panel-subtitle">Top parsed topics related to your search query</p>
-                    </div>
-                    <div class="trends-table-container">
-                        <table class="trends-table" id="trends-table-body">
-                            <thead>
-                                <tr>
-                                    <th>Topic / Headline</th>
-                                    <th>Source</th>
-                                    <th>Growth %</th>
-                                    <th>Score</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Inserted dynamically via Javascript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- STEP 2: Trend Ranking Panel -->
-                <div class="glassmorphism content-card" id="panel-step2">
-                    <div class="panel-header">
-                        <span class="badge badge-purple">Step 2</span>
-                        <h3 class="panel-title"><i data-lucide="award" class="title-icon"></i> Selected Trend Metrics</h3>
-                        <p class="panel-subtitle">Evaluated scores for the winning script topic</p>
-                    </div>
-                    <div class="trend-ranking-details" id="ranking-details-container">
-                        <!-- Content rendered dynamically via js -->
-                    </div>
-                </div>
-
+        <!-- ==========================================
+             2. TRENDS VIEW
+             ========================================== -->
+        <section id="trends-view" class="view-section hide">
+            <div class="view-header">
+                <h2 class="view-title"><i data-lucide="trending-up"></i> Trends Intelligence</h2>
+                <p class="view-subtitle">Top parsed viral topics based on your generated blueprint</p>
             </div>
 
-            <!-- COLUMN 2: STUDIO CONTENT CREATOR -->
-            <div class="grid-col flex-column">
-                
-                <!-- STEP 3: Viral Reel Generator -->
-                <div class="glassmorphism content-card" id="panel-step3">
-                    <div class="panel-header header-with-action">
-                        <div>
-                            <span class="badge badge-blue">Step 3</span>
-                            <h3 class="panel-title"><i data-lucide="video" class="title-icon"></i> Viral Reel Script</h3>
-                            <p class="panel-subtitle">High-retention video script formatted for engagement</p>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="icon-btn" id="copy-reel-btn" title="Copy Reel Script" aria-label="Copy Reel Script"><i data-lucide="copy"></i></button>
-                            <button class="icon-btn" id="regenerate-reel-btn" title="Regenerate Script" aria-label="Regenerate Script"><i data-lucide="rotate-cw"></i></button>
-                        </div>
-                    </div>
+            <!-- Trends Card Grid -->
+            <div class="trends-cards-grid" id="trends-cards-container">
+                <!-- Loaded dynamically via js -->
+            </div>
+
+            <!-- Slide-in Side Drawer for details -->
+            <div class="side-panel-drawer" id="trends-side-panel">
+                <div class="drawer-header">
+                    <h3>Trend Matrix details</h3>
+                    <button class="close-drawer-btn" id="close-drawer-button" aria-label="Close details panel">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="drawer-body" id="drawer-content-container">
+                    <!-- Loaded dynamically via js -->
+                </div>
+            </div>
+            <!-- Drawer Backdrop Overlay -->
+            <div class="drawer-backdrop hide" id="drawer-backdrop-overlay"></div>
+        </section>
+
+        <!-- ==========================================
+             3. CONTENT STUDIO VIEW
+             ========================================== -->
+        <section id="content-studio-view" class="view-section hide">
+            <div class="view-header flex-header">
+                <div>
+                    <h2 class="view-title"><i data-lucide="clapperboard"></i> Content Studio</h2>
+                    <p class="view-subtitle">Copywriting blueprints optimized for short-form retention and organic feed reach</p>
+                </div>
+                <!-- Control Buttons -->
+                <div class="action-buttons-studio">
+                    <button class="studio-action-btn copy-studio-btn" id="studio-copy-btn">
+                        <i data-lucide="copy"></i> Copy Content
+                    </button>
+                    <button class="studio-action-btn regen-studio-btn" id="studio-regenerate-btn">
+                        <i data-lucide="rotate-cw"></i> Regenerate
+                    </button>
+                    <button class="studio-action-btn export-studio-btn" id="studio-export-btn">
+                        <i data-lucide="download"></i> Export Report (.md)
+                    </button>
+                </div>
+            </div>
+
+            <div class="studio-workspace glassmorphism">
+                <!-- Sub Tab Nav bar -->
+                <div class="studio-tabs-bar">
+                    <button class="studio-tab-item active" id="tab-reel"><i data-lucide="video"></i> Reel Script</button>
+                    <button class="studio-tab-item" id="tab-linkedin"><i data-lucide="linkedin"></i> LinkedIn Post</button>
+                    <button class="studio-tab-item" id="tab-instagram"><i data-lucide="instagram"></i> Instagram Caption</button>
+                </div>
+
+                <!-- Studio Output Editor Area -->
+                <div class="studio-editor-content">
                     
-                    <div class="reel-script-output" id="reel-script-container">
-                        <div class="script-segment">
-                            <div class="segment-label"><i data-lucide="anchor"></i> Hook (0-5s)</div>
-                            <blockquote class="segment-text" id="script-hook">"Stop scrolling! This single AI tool..."</blockquote>
-                        </div>
-                        <div class="script-segment">
-                            <div class="segment-label"><i data-lucide="align-left"></i> Story & Background (5-25s)</div>
-                            <blockquote class="segment-text" id="script-story">"A new autonomous coding agent..."</blockquote>
-                        </div>
-                        <div class="script-segment">
-                            <div class="segment-label"><i data-lucide="list-checks"></i> Key Takeaways (25-40s)</div>
-                            <ul class="segment-bullets-list" id="script-insights">
-                                <li>Reduces deployment cycles down to seconds.</li>
-                                <li>Democratizes SaaS development for solo builders.</li>
-                                <li>Scales workflow throughput efficiently.</li>
-                            </ul>
-                        </div>
-                        <div class="script-segment no-border">
-                            <div class="segment-label"><i data-lucide="target"></i> Call to Action (40-45s)</div>
-                            <blockquote class="segment-text highlight-cta" id="script-cta">"Comment 'CODE' for early access!"</blockquote>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- STEP 4: LinkedIn Content Generator -->
-                <div class="glassmorphism content-card" id="panel-step4">
-                    <div class="panel-header header-with-action">
-                        <div>
-                            <span class="badge badge-blue">Step 4</span>
-                            <h3 class="panel-title"><i data-lucide="linkedin" class="title-icon icon-linkedin"></i> LinkedIn Post</h3>
-                            <p class="panel-subtitle">Authority building copy optimized for feed reach</p>
-                        </div>
-                        <button class="icon-btn" id="copy-linkedin-btn" title="Copy LinkedIn Post" aria-label="Copy LinkedIn Post"><i data-lucide="copy"></i></button>
-                    </div>
-                    <div class="linkedin-output-box">
-                        <div class="copy-body-block" id="linkedin-post-body">Loading...</div>
-                        <div class="copy-hashtag-block" id="linkedin-hashtags">Loading...</div>
-                        <div class="engagement-badge" id="linkedin-engagement">Loading...</div>
-                    </div>
-                </div>
-
-                <!-- STEP 5: Instagram Content Generator -->
-                <div class="glassmorphism content-card" id="panel-step5">
-                    <div class="panel-header header-with-action">
-                        <div>
-                            <span class="badge badge-blue">Step 5</span>
-                            <h3 class="panel-title"><i data-lucide="instagram" class="title-icon icon-instagram"></i> Instagram Caption</h3>
-                            <p class="panel-subtitle">Casual energetic caption with high CTA conversion</p>
-                        </div>
-                        <button class="icon-btn" id="copy-instagram-btn" title="Copy Instagram Caption" aria-label="Copy Instagram Caption"><i data-lucide="copy"></i></button>
-                    </div>
-                    <div class="instagram-output-box">
-                        <div class="copy-body-block" id="instagram-caption-body">Loading...</div>
-                        <div class="copy-hashtag-block" id="instagram-hashtags">Loading...</div>
-                        <div class="engagement-badge" id="instagram-cta">Loading...</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- COLUMN 3: VIRALITY ANALYTICS -->
-            <div class="grid-col flex-column">
-                
-                <!-- STEP 6: Virality Prediction Dashboard -->
-                <div class="glassmorphism content-card" id="panel-step6">
-                    <div class="panel-header">
-                        <span class="badge badge-neon">Step 6</span>
-                        <h3 class="panel-title"><i data-lucide="trending-up" class="title-icon icon-cyan"></i> Virality Forecaster</h3>
-                        <p class="panel-subtitle">XGBoost prediction metrics based on historical dynamics</p>
-                    </div>
-
-                    <!-- Main Virality Gauge & Summary -->
-                    <div class="virality-score-section">
-                        <div class="gauge-chart-container">
-                            <canvas id="viralityGaugeChart"></canvas>
-                            <div class="gauge-center-text">
-                                <span class="gauge-percent" id="virality-percentage">88%</span>
-                                <span class="gauge-lbl">Virality Score</span>
+                    <!-- TAB 1: REEL SCRIPT WORKSPACE -->
+                    <div class="studio-tab-panel active" id="panel-reel">
+                        <div class="reel-script-output">
+                            <div class="script-segment">
+                                <div class="segment-label"><i data-lucide="anchor"></i> Hook (0-5s)</div>
+                                <blockquote class="segment-text large-script-text" id="studio-script-hook">"Stop scrolling! This single AI tool..."</blockquote>
+                            </div>
+                            <div class="script-segment">
+                                <div class="segment-label"><i data-lucide="align-left"></i> Story & Narrative (5-25s)</div>
+                                <blockquote class="segment-text large-script-text" id="studio-script-story">"A new autonomous coding agent..."</blockquote>
+                            </div>
+                            <div class="script-segment">
+                                <div class="segment-label"><i data-lucide="list-checks"></i> Key Takeaways (25-40s)</div>
+                                <ul class="segment-bullets-list large-script-text" id="studio-script-insights">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+                            <div class="script-segment no-border">
+                                <div class="segment-label"><i data-lucide="target"></i> Call to Action (40-45s)</div>
+                                <blockquote class="segment-text highlight-cta large-script-text" id="studio-script-cta">"Comment 'CODE' for early access!"</blockquote>
                             </div>
                         </div>
-                        <div class="prediction-status-card">
-                            <div class="status-indicator-dot secure"></div>
-                            <span class="status-indicator-text" id="status-verdict">Highly Viral Potential</span>
+                    </div>
+
+                    <!-- TAB 2: LINKEDIN WORKSPACE -->
+                    <div class="studio-tab-panel" id="panel-linkedin">
+                        <div class="social-copy-workspace">
+                            <div class="copy-body-block large-script-text" id="studio-linkedin-body">Loading LinkedIn Post...</div>
+                            <div class="studio-divider"></div>
+                            <div class="meta-row">
+                                <div class="meta-group">
+                                    <span class="meta-label">Suggested Hashtags</span>
+                                    <span class="copy-hashtag-block" id="studio-linkedin-hashtags">Loading...</span>
+                                </div>
+                                <div class="meta-group">
+                                    <span class="meta-label">Engagement Catalyst</span>
+                                    <span class="engagement-badge" id="studio-linkedin-engagement">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Metrics Cards Grid -->
+                    <!-- TAB 3: INSTAGRAM WORKSPACE -->
+                    <div class="studio-tab-panel" id="panel-instagram">
+                        <div class="social-copy-workspace">
+                            <div class="copy-body-block large-script-text" id="studio-instagram-body">Loading Instagram Caption...</div>
+                            <div class="studio-divider"></div>
+                            <div class="meta-row">
+                                <div class="meta-group">
+                                    <span class="meta-label">Suggested Hashtags</span>
+                                    <span class="copy-hashtag-block" id="studio-instagram-hashtags">Loading...</span>
+                                </div>
+                                <div class="meta-group">
+                                    <span class="meta-label">Reel Target CTA</span>
+                                    <span class="engagement-badge" id="studio-instagram-cta">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Toast alert -->
+            <div class="export-success-message hide" id="studio-toast">
+                <i data-lucide="check-circle"></i> Operation completed successfully!
+            </div>
+        </section>
+
+        <!-- ==========================================
+             4. ANALYTICS VIEW
+             ========================================== -->
+        <section id="analytics-view" class="view-section hide">
+            <div class="view-header">
+                <h2 class="view-title"><i data-lucide="bar-chart-3"></i> Virality Analytics</h2>
+                <p class="view-subtitle">High-fidelity engagement forecasting and reach projections compiled using ML inference</p>
+            </div>
+
+            <!-- Analytics Workspace Grid -->
+            <div class="analytics-dashboard-grid">
+                
+                <!-- Left column: Score & Metric cards -->
+                <div class="analytics-col flex-column">
+                    <div class="glassmorphism content-card align-center flex-grow">
+                        <div class="panel-header text-center">
+                            <span class="badge badge-neon">Inference Score</span>
+                            <h3 class="panel-title justify-center"><i data-lucide="trending-up" class="title-icon icon-cyan"></i> Virality Quotient</h3>
+                        </div>
+                        
+                        <div class="virality-score-section">
+                            <div class="gauge-chart-container">
+                                <canvas id="viralityGaugeChart"></canvas>
+                                <div class="gauge-center-text">
+                                    <span class="gauge-percent" id="virality-percentage">--%</span>
+                                    <span class="gauge-lbl">Virality Score</span>
+                                </div>
+                            </div>
+                            <div class="prediction-status-card">
+                                <div class="status-indicator-dot secure"></div>
+                                <span class="status-indicator-text" id="status-verdict">Running Prediction...</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="metrics-subgrid">
-                        <div class="metric-mini-card">
+                        <div class="glassmorphism metric-mini-card">
                             <span class="metric-mini-lbl"><i data-lucide="eye"></i> Expected Views</span>
-                            <span class="metric-mini-val" id="metric-views">750K</span>
+                            <span class="metric-mini-val" id="metric-views">--</span>
                         </div>
-                        <div class="metric-mini-card">
+                        <div class="glassmorphism metric-mini-card">
                             <span class="metric-mini-lbl"><i data-lucide="heart"></i> Expected Likes</span>
-                            <span class="metric-mini-val" id="metric-likes">58K</span>
+                            <span class="metric-mini-val" id="metric-likes">--</span>
                         </div>
-                        <div class="metric-mini-card">
+                        <div class="glassmorphism metric-mini-card">
                             <span class="metric-mini-lbl"><i data-lucide="share-2"></i> Expected Shares</span>
-                            <span class="metric-mini-val" id="metric-shares">18.5K</span>
+                            <span class="metric-mini-val" id="metric-shares">--</span>
                         </div>
-                        <div class="metric-mini-card">
+                        <div class="glassmorphism metric-mini-card">
                             <span class="metric-mini-lbl"><i data-lucide="bookmark"></i> Expected Saves</span>
-                            <span class="metric-mini-val" id="metric-saves">32K</span>
+                            <span class="metric-mini-val" id="metric-saves">--</span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Chart 1: Line chart for projected engagement -->
-                    <div class="chart-wrapper-box">
-                        <h4 class="chart-box-title">Projected Engagement Curve (24h)</h4>
+                <!-- Right column: Charts -->
+                <div class="analytics-col charts-subgrid">
+                    <div class="glassmorphism chart-wrapper-box">
+                        <h4 class="chart-box-title">Projected Engagement Curve (24h Views & Likes)</h4>
                         <div class="chart-canvas-holder">
                             <canvas id="engagementLineChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- Chart 2: Bar chart for platform reach comparison -->
-                    <div class="chart-wrapper-box">
-                        <h4 class="chart-box-title">Cross-Platform Reach Forecast</h4>
+                    <div class="glassmorphism chart-wrapper-box">
+                        <h4 class="chart-box-title">Cross-Platform Reach Forecast (Views)</h4>
                         <div class="chart-canvas-holder">
                             <canvas id="platformReachBarChart"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- STEP 7: Export / Report Section -->
-                <div class="glassmorphism content-card" id="panel-export">
-                    <div class="panel-header">
-                        <h3 class="panel-title"><i data-lucide="download" class="title-icon"></i> Download Asset Report</h3>
-                        <p class="panel-subtitle">Export script bundles, analytics data, and media briefs as a formatted report</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         STEP-BY-STEP WORKFLOW WIZARD MODAL
+         ========================================== -->
+    <div class="wizard-modal-overlay hide" id="wizard-modal">
+        <div class="wizard-modal-card glassmorphism">
+            
+            <div class="wizard-header">
+                <div class="wizard-pulsing-badge">
+                    <div class="pulse-ring"></div>
+                    <i data-lucide="cpu" class="wizard-icon-spin"></i>
+                </div>
+                <div class="wizard-titles">
+                    <h2>Deploying Workflow Agents</h2>
+                    <p id="wizard-global-status">Orchestrating multi-agent nodes...</p>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="wizard-progress-bar-outer">
+                <div class="wizard-progress-bar-inner" id="wizard-progress-bar"></div>
+            </div>
+
+            <!-- Steps Grid -->
+            <div class="wizard-steps-list">
+                
+                <div class="wizard-step-node" id="wstep-1">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
                     </div>
-                    <button class="export-report-btn" id="export-report-button">
-                        <i data-lucide="file-text"></i>
-                        <span>Export Styled Report (.MD)</span>
-                    </button>
-                    <div class="export-success-message hide" id="export-toast">
-                        <i data-lucide="check-circle"></i> Styled report downloaded successfully.
+                    <div class="wstep-details">
+                        <span class="wstep-number">Step 1</span>
+                        <h4>Select Topic</h4>
+                        <p class="wstep-desc">Register niche keyphrases...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-2">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Step 2</span>
+                        <h4>Discover Trends</h4>
+                        <p class="wstep-desc">Querying RSS & Reddit indices...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-3">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Step 3</span>
+                        <h4>Rank Trends</h4>
+                        <p class="wstep-desc">Evaluating RandomForest metric weights...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-4">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Step 4</span>
+                        <h4>Generate Script</h4>
+                        <p class="wstep-desc">Drafting retention reel blueprint...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-5">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Step 5</span>
+                        <h4>Generate Social Content</h4>
+                        <p class="wstep-desc">Copywriting Instagram & LinkedIn feeds...</p>
+                    </div>
+                </div>
+
+                <div class="wizard-step-node" id="wstep-6">
+                    <div class="wstep-icon-status">
+                        <div class="spinner-mini hide"></div>
+                        <i data-lucide="check-circle" class="check-icon hide"></i>
+                    </div>
+                    <div class="wstep-details">
+                        <span class="wstep-number">Step 6</span>
+                        <h4>Predict Virality</h4>
+                        <p class="wstep-desc">Running XGBoost regression analysis...</p>
                     </div>
                 </div>
 
             </div>
 
-        </section>
-
-    </main>
+        </div>
+    </div>
 
     <!-- Footer Section -->
     <footer class="main-footer">
