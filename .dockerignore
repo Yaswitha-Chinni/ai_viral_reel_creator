@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env
+.dockerignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.db
+.sqlite
+*.mp3
+*.mp4
+*.png
+.streamlit/
+venv/
+env/
