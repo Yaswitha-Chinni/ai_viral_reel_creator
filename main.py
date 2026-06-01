@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from PIL import Image, ImageDraw, ImageFont
 from gtts import gTTS
 import google.generativeai as genai
+from faker import Faker
 
 # LangChain imports
 from langchain_core.tools import tool
@@ -46,7 +47,6 @@ def detect_gemini_model():
     if not api_key:
         return "gemini-2.5-flash"
     try:
-        # Quick check for model availability
         models = [m.name for m in genai.list_models()]
         if 'models/gemini-1.5-flash' in models:
             return 'gemini-1.5-flash'
@@ -57,10 +57,28 @@ def detect_gemini_model():
         else:
             return 'gemini-flash-latest'
     except Exception:
-        # Default fallback
         return "gemini-2.5-flash"
 
 gemini_model_name = detect_gemini_model()
+
+# Gemini call utility with rate-limiting error handling
+def call_gemini_safe(prompt):
+    """
+    Executes a prompt on Gemini, catching rate limits (429/ResourceExhausted)
+    and showing a retry warning.
+    """
+    try:
+        model = genai.GenerativeModel(gemini_model_name)
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        err_msg = str(e).lower()
+        if "429" in err_msg or "resourceexhausted" in err_msg or "rate limit" in err_msg or "quota" in err_msg:
+            st.error("⏳ Gemini API Rate Limit Exceeded. Wait 4sec and retry.")
+            time.sleep(4)
+            st.stop()
+        else:
+            raise e
 
 # MoviePy lazy loader
 def get_moviepy_editor():
@@ -71,31 +89,68 @@ def get_moviepy_editor():
         st.warning(f"MoviePy imports failed: {e}. Video generation will run in fallback audio-only mode.")
         return None
 
-# Generate fake 50-row CSV on startup if not present
-csv_path = "virality_training_data.csv"
-if not os.path.exists(csv_path):
-    np.random.seed(42)
-    df_fake = pd.DataFrame({
-        "trend_score": np.random.uniform(50, 98, 50),
-        "hook_word_count": np.random.randint(5, 22, 50),
-        "topic_novelty": np.random.uniform(30, 95, 50)
-    })
-    # Target virality score
-    # Sweet spot hook word count is ~9 to 13 words
-    hook_dev = abs(df_fake["hook_word_count"] - 11)
-    df_fake["virality_score"] = (
-        df_fake["trend_score"] * 0.45 + 
-        (25 - hook_dev * 2.5) + 
-        df_fake["topic_novelty"] * 0.35 + 
-        np.random.normal(0, 4, 50)
-    )
-    df_fake["virality_score"] = df_fake["virality_score"].clip(20, 99.5)
-    df_fake.to_csv(csv_path, index=False)
+# ==========================================
+# 1. Cached XGBoost training & Data Gen
+# ==========================================
+csv_train_path = os.path.join("data", "virality_train.csv")
 
-# Custom Sentiment Heuristic for RandomForest Ranker
+def ensure_virality_training_data():
+    """
+    Generates a 50-row CSV file using Faker with columns:
+    hook_words, trend_score, novelty, views (views represents virality score).
+    """
+    if not os.path.exists("data"):
+        os.makedirs("data", exist_ok=True)
+        
+    if not os.path.exists(csv_train_path):
+        fake = Faker()
+        np.random.seed(42)
+        rows = []
+        for _ in range(50):
+            hook_text = fake.sentence(nb_words=np.random.randint(6, 16))
+            trend_val = float(np.random.uniform(50, 98))
+            novel_val = float(np.random.uniform(30, 95))
+            
+            # Target views formula:
+            # Optimal hook has around 11 words
+            words_count = len(hook_text.split())
+            hook_dev = abs(words_count - 11)
+            views_val = trend_val * 0.45 + (25 - hook_dev * 2.5) + novel_val * 0.35 + np.random.normal(0, 4)
+            views_val = float(np.clip(views_val, 20.0, 99.5))
+            
+            rows.append({
+                "hook_words": hook_text,
+                "trend_score": trend_val,
+                "novelty": novel_val,
+                "views": views_val
+            })
+            
+        df = pd.DataFrame(rows)
+        df.to_csv(csv_train_path, index=False)
+
+# Train and Cache XGBoost Model on Startup
+@st.cache_resource
+def get_cached_xgboost_model():
+    ensure_virality_training_data()
+    df = pd.read_csv(csv_train_path)
+    
+    # Feature engineering: extract hook word count
+    df["hook_word_count"] = df["hook_words"].apply(lambda x: len(str(x).split()))
+    
+    X = df[["trend_score", "hook_word_count", "novelty"]]
+    y = df["views"]
+    
+    xgb = XGBRegressor(n_estimators=30, max_depth=3, learning_rate=0.1, random_state=42)
+    xgb.fit(X, y)
+    return xgb
+
+# Initialize model cache on startup
+cached_xgb_model = get_cached_xgboost_model()
+
+# Heuristic sentiment scorer for RandomForest ranker
 def compute_sentiment(title):
-    pos_triggers = ["breakthrough", "new", "release", "future", "epic", "scale", "power", "unreal", "quantum", "openai"]
-    neg_triggers = ["fail", "mistake", "scam", "danger", "worst", "bug", "stagnant", "broke", "expensive"]
+    pos_triggers = ["breakthrough", "new", "release", "future", "epic", "scale", "power", "unreal", "quantum", "openai", "verge", "techcrunch"]
+    neg_triggers = ["fail", "mistake", "scam", "danger", "worst", "bug", "stagnant", "broke", "expensive", "layoffs"]
     title_lower = title.lower()
     score = 0.0
     for w in pos_triggers:
@@ -107,7 +162,7 @@ def compute_sentiment(title):
     return max(min(score, 1.0), -1.0)
 
 # ==========================================
-# 1. Custom CSS Theme & Glassmorphism Design
+# 2. Custom CSS Theme & Glassmorphism Design
 # ==========================================
 st.markdown("""
 <style>
@@ -193,11 +248,10 @@ html, body, [class*="css"], .stApp {
 </style>
 """, unsafe_allow_html=True)
 
-# Main Titles
 st.markdown("<div class='main-title'>RATEFLUENCER AI AGENT</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>LangChain Orchestrated Content Generation Chain & Virality Score Predictor</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Orchestrated Content Engine with TechCrunch/Verge RSS & Cached XGBoost</div>", unsafe_allow_html=True)
 
-# Session state initialization
+# Initialize Session States
 if "agent_run_complete" not in st.session_state:
     st.session_state.agent_run_complete = False
 if "agent_logs" not in st.session_state:
@@ -211,19 +265,17 @@ if "video_path" not in st.session_state:
 if "virality_data" not in st.session_state:
     st.session_state.virality_data = {}
 
-# ==========================================
-# 2. Sidebar details
-# ==========================================
+# Sidebar details
 with st.sidebar:
     st.markdown("### ⚙️ Engine Configurations")
     st.markdown(f"**LLM Model:** `{gemini_model_name}` ✅")
     st.markdown("**GCP Project:** `my-sample-project-495116`")
     st.markdown("---")
     
-    st.markdown("### 📊 Fake CSV Training Data (50 Rows)")
-    if os.path.exists(csv_path):
-        st.success("virality_training_data.csv ready")
-        df_show = pd.read_csv(csv_path)
+    st.markdown("### 📊 Cached Train CSV (/data/virality_train.csv)")
+    if os.path.exists(csv_train_path):
+        st.success("virality_train.csv created")
+        df_show = pd.read_csv(csv_train_path)
         st.dataframe(df_show.head(8), height=250)
     else:
         st.error("CSV training file missing")
@@ -231,25 +283,27 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### ℹ️ LangChain Agent Setup")
     st.info(
-        "This tool calls a sequential LangChain flow that chains 5 customized tools to "
-        "discover, rank, write, compile, and predict virality for your video content."
+        "Chains 5 tools: Reddit+RSS Trends -> RandomForest Ranker -> Gemini ScriptWriter -> MoviePy VideoMaker -> Cached XGBoost ViralityPredictor."
     )
 
 # ==========================================
 # 3. LangChain Tool Definitions
 # ==========================================
 
+import feedparser
+
 @tool
-def reddit_trend_tool(query: str = "") -> str:
+def reddit_and_rss_trend_tool(query: str = "") -> str:
     """
-    Tool 1: RedditTrendTool
-    Gets the top 10 posts from r/MachineLearning, r/startups, and r/technology from the last 24 hours.
-    No API keys are required for read-only.
+    Tool 1: RedditAndRSSTrendTool
+    Gets the top 10 posts from r/MachineLearning, r/startups, r/technology from last 24h,
+    and parses headlines from TechCrunch + The Verge RSS feeds. Merges all into a single list.
     """
     headers = {"User-Agent": "ratefluencer_bot/1.0"}
-    subreddits = ["MachineLearning", "startups", "technology"]
     all_posts = []
     
+    # 1. Fetch Reddit trends (read-only)
+    subreddits = ["MachineLearning", "startups", "technology"]
     for sub in subreddits:
         try:
             url = f"https://www.reddit.com/r/{sub}/top/.json?t=day&limit=10"
@@ -263,20 +317,40 @@ def reddit_trend_tool(query: str = "") -> str:
                         "upvotes": pdata.get("score", 0),
                         "num_comments": pdata.get("num_comments", 0),
                         "created_utc": pdata.get("created_utc", 0),
-                        "subreddit": sub
+                        "subreddit": f"r/{sub}"
                     })
         except Exception:
             pass
             
-    # Fallback to realistic mock posts if Reddit rate-limits or network is offline
+    # 2. Fetch TechCrunch + The Verge RSS Feeds
+    rss_feeds = {
+        "TechCrunch": "https://techcrunch.com/feed/",
+        "The Verge": "https://www.theverge.com/rss/index.xml"
+    }
+    for source_name, rss_url in rss_feeds.items():
+        try:
+            feed = feedparser.parse(rss_url)
+            for entry in feed.entries[:8]:
+                created_utc = time.time()
+                if hasattr(entry, "published_parsed") and entry.published_parsed:
+                    created_utc = time.mktime(entry.published_parsed)
+                all_posts.append({
+                    "title": entry.title,
+                    "upvotes": np.random.randint(150, 1000),  # simulate upvotes
+                    "num_comments": np.random.randint(20, 150),  # simulate comments
+                    "created_utc": created_utc,
+                    "subreddit": source_name
+                })
+        except Exception:
+            pass
+            
+    # Fallback to defaults if all remote calls fail
     if not all_posts:
         all_posts = [
-            {"title": "OpenAI releases new locally executable lightweight model", "upvotes": 1250, "num_comments": 180, "created_utc": time.time() - 3600*2, "subreddit": "technology"},
-            {"title": "How to scale your SaaS from $0 to $10k MRR in 3 months", "upvotes": 520, "num_comments": 95, "created_utc": time.time() - 3600*4, "subreddit": "startups"},
-            {"title": "New research trains 100B parameter model on a single GPU", "upvotes": 850, "num_comments": 120, "created_utc": time.time() - 3600*6, "subreddit": "MachineLearning"},
-            {"title": "Apple integrates system-wide agentic workflows in iOS", "upvotes": 2200, "num_comments": 390, "created_utc": time.time() - 3600*1, "subreddit": "technology"},
-            {"title": "Why pricing your startup too low is the biggest mistake you can make", "upvotes": 410, "num_comments": 70, "created_utc": time.time() - 3600*10, "subreddit": "startups"},
-            {"title": "DeepSeek-V3 launches open source reasoning benchmarks", "upvotes": 1800, "num_comments": 310, "created_utc": time.time() - 3600*3, "subreddit": "technology"}
+            {"title": "OpenAI releases new locally executable lightweight model", "upvotes": 1250, "num_comments": 180, "created_utc": time.time() - 7200, "subreddit": "r/technology"},
+            {"title": "How to scale your SaaS from $0 to $10k MRR in 3 months", "upvotes": 520, "num_comments": 95, "created_utc": time.time() - 14400, "subreddit": "r/startups"},
+            {"title": "New Verge Report: Apple shifts focus towards fully Agentic Siri", "upvotes": 1600, "num_comments": 290, "created_utc": time.time() - 3600, "subreddit": "The Verge"},
+            {"title": "TechCrunch analysis: SaaS VC funding rebound in mid-2026", "upvotes": 750, "num_comments": 80, "created_utc": time.time() - 18000, "subreddit": "TechCrunch"}
         ]
         
     return json.dumps(all_posts)
@@ -291,23 +365,21 @@ def trend_ranker(posts_json: str) -> str:
     """
     posts = json.loads(posts_json)
     
-    # Train dummy RandomForest model on startup
+    # Train RandomForest Regressor on dummy parameters
     np.random.seed(42)
-    X_train = np.random.rand(100, 4)  # features: normalized upvotes, normalized comments, sentiment, normalized hours
-    # Target score: higher upvotes/comments/sentiment and lower hours yields higher score
+    X_train = np.random.rand(100, 4)
     y_train = (X_train[:, 0] * 35 + X_train[:, 1] * 25 + X_train[:, 2] * 25 + (1.0 - X_train[:, 3]) * 15)
     
     rf = RandomForestRegressor(n_estimators=15, random_state=42)
     rf.fit(X_train, y_train)
     
-    # Prepare features for the actual posts
-    # Normalizing parameters: max upvotes=3000, max comments=500, max hours=24
+    # Run predictions
     features = []
     current_time = time.time()
     for p in posts:
         up_norm = min(p.get("upvotes", 0), 3000) / 3000.0
         cm_norm = min(p.get("num_comments", 0), 500) / 500.0
-        sent = (compute_sentiment(p.get("title", "")) + 1.0) / 2.0  # map -1..1 to 0..1
+        sent = (compute_sentiment(p.get("title", "")) + 1.0) / 2.0
         
         hours = max((current_time - p.get("created_utc", 0)) / 3600.0, 0.1)
         hours_norm = min(hours, 24.0) / 24.0
@@ -317,14 +389,12 @@ def trend_ranker(posts_json: str) -> str:
     preds = rf.predict(features) * 100.0
     preds = np.clip(preds, 10.0, 99.8)
     
-    # Add score to each post
     for i, p in enumerate(posts):
         p["score"] = round(preds[i], 1)
         p["sentiment"] = round(compute_sentiment(p.get("title")), 2)
         hours = max((current_time - p.get("created_utc", 0)) / 3600.0, 0.1)
         p["hours_since_post"] = round(hours, 1)
         
-    # Sort posts descending by score
     ranked_posts = sorted(posts, key=lambda x: x["score"], reverse=True)
     return json.dumps(ranked_posts)
 
@@ -333,6 +403,7 @@ def script_writer(ranked_trends_json: str) -> str:
     """
     Tool 3: ScriptWriter
     Writes a 45-second script about the highest-scoring trend using Gemini.
+    With robust error handling: catches rate limits (429/ResourceExhausted) and notifies the user.
     Output JSON format: {hook, insight1, insight2, insight3, cta}.
     """
     ranked_posts = json.loads(ranked_trends_json)
@@ -343,7 +414,7 @@ def script_writer(ranked_trends_json: str) -> str:
     
     prompt = f"""
     You are an expert short-form content creator. Write a high-retention 45-second reel script about the trending topic:
-    "{title}" (from subreddit r/{sub}).
+    "{title}" (from source: {sub}).
     
     Format the response strictly as a JSON object with these exact keys. Do not include any markdown format tags like ```json or ```.
     JSON Keys:
@@ -356,28 +427,21 @@ def script_writer(ranked_trends_json: str) -> str:
     Keep the tone spoken, conversational, and energetic.
     """
     
+    # Safe Gemini execution with 429 catches
+    text = call_gemini_safe(prompt)
+    
     try:
-        model = genai.GenerativeModel(gemini_model_name)
-        response = model.generate_content(prompt)
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text.replace("```json", "", 1)
-        if text.endswith("```"):
-            text = text.rsplit("```", 1)[0]
-        text = text.strip()
-        
         script_data = json.loads(text)
         script_data["trend_score"] = float(score)
         script_data["topic"] = title
         return json.dumps(script_data)
-    except Exception as e:
-        # Fallback script JSON in case of API limits or JSON parse error
+    except Exception:
         fallback = {
-            "hook": f"Wait! This new trend in r/{sub} changes everything.",
-            "insight1": f"Everyone is talking about '{title}' right now.",
-            "insight2": "It's breaking records in upvotes and comment engagement.",
-            "insight3": "This represents a major shift in modern workflow implementations.",
-            "cta": "Like and follow for more!",
+            "hook": f"This new development in {sub} is changing everything.",
+            "insight1": f"Everyone is looking into '{title}' right now.",
+            "insight2": "It represents a significant milestone in modern tech integrations.",
+            "insight3": "This is changing how developers compile and deploy projects.",
+            "cta": "Like and follow for updates!",
             "trend_score": float(score),
             "topic": title
         }
@@ -398,7 +462,6 @@ def video_maker(script_json: str) -> str:
     i3 = script.get("insight3", "")
     cta = script.get("cta", "")
     
-    # Text overlay elements
     slides_text = [hook, i1, i2, i3, cta]
     full_narration = f"{hook} ... {i1} ... {i2} ... {i3} ... {cta}"
     
@@ -406,13 +469,12 @@ def video_maker(script_json: str) -> str:
     audio_path = os.path.join(temp_dir, "ratefluencer_lc_audio.mp3")
     video_path = os.path.join(temp_dir, "ratefluencer_lc_video.mp4")
     
-    # 1. Generate Voiceover MP3
+    # 1. TTS
     tts = gTTS(text=full_narration, lang='en', tld='com', slow=False)
     tts.save(audio_path)
     
     mp = get_moviepy_editor()
     if not mp:
-        # Fallback to audio bytes if MoviePy can't load
         with open(audio_path, "rb") as f:
             st.session_state.generated_voiceover = f.read()
         return "Video skipped: MoviePy missing. Audio generated."
@@ -427,7 +489,6 @@ def video_maker(script_json: str) -> str:
         windows_font_path = "C:\\Windows\\Fonts\\segoeuib.ttf"
         windows_font_path_reg = "C:\\Windows\\Fonts\\segoeui.ttf"
         
-        # 2. Render Portrait Frames
         for idx, text in enumerate(slides_text):
             img = Image.new("RGBA", (1080, 1920), (10, 11, 16, 255))
             draw = ImageDraw.Draw(img)
@@ -442,7 +503,7 @@ def video_maker(script_json: str) -> str:
             ]
             color_a, color_b = gradients[idx % len(gradients)]
             
-            # Gradient glow circles
+            # Draw gradient circles
             for r in range(500, 0, -3):
                 draw.ellipse([(150-r, 350-r), (150+r, 350+r)], fill=(color_a[0], color_a[1], color_a[2], int(15 * (1 - r/500))))
                 draw.ellipse([(930-r, 1570-r), (930+r, 1570+r)], fill=(color_b[0], color_b[1], color_b[2], int(15 * (1 - r/500))))
@@ -450,7 +511,6 @@ def video_maker(script_json: str) -> str:
             # Content Card
             draw.rounded_rectangle([(80, 480), (1000, 1440)], radius=35, fill=(0, 0, 0, 130), outline=(255, 255, 255, 25), width=2)
             
-            # Fonts
             if os.path.exists(windows_font_path):
                 font_lbl = ImageFont.truetype(windows_font_path, 40)
                 font_body = ImageFont.truetype(windows_font_path_reg, 48)
@@ -460,8 +520,7 @@ def video_maker(script_json: str) -> str:
                 font_body = ImageFont.load_default()
                 font_footer = ImageFont.load_default()
                 
-            # Slide Header
-            labels = ["✨ THE HOOK", "💡 INSIGHT 1", "💡 INSIGHT 2", "💡 INSIGHT 3", "🎯 ACTION"]
+            labels = ["✨ HOOK", "💡 INSIGHT 1", "💡 INSIGHT 2", "💡 INSIGHT 3", "🎯 CTA"]
             draw.text((540, 580), labels[idx], fill=(0, 245, 212, 255), font=font_lbl, anchor="mm")
             
             # Word Wrap text
@@ -483,28 +542,23 @@ def video_maker(script_json: str) -> str:
             if current_line:
                 lines.append(current_line)
                 
-            # Draw lines of text
             y_offset = 820
             for line in lines[:6]:
                 draw.text((540, y_offset), line, fill=(255, 255, 255, 255), font=font_body, anchor="mm")
                 y_offset += 80
                 
-            # Draw branding footer
             draw.text((540, 1340), "⚡ Ratefluencer AI Agent", fill=(139, 155, 180, 140), font=font_footer, anchor="mm")
             
             # Save slide
             slide_path = os.path.join(temp_dir, f"lc_slide_{idx}.png")
             img.save(slide_path)
             
-            # Compile clip
             clip = mp.ImageClip(slide_path).set_duration(slide_duration)
             slide_clips.append(clip)
             
-        # 3. Concatenate Clips & Merge Audio
         video_clip = mp.concatenate_videoclips(slide_clips, method="compose")
         video_clip = video_clip.set_audio(audio_clip)
         
-        # Output file
         video_clip.write_videofile(
             video_path,
             fps=12,
@@ -519,7 +573,6 @@ def video_maker(script_json: str) -> str:
             c.close()
         video_clip.close()
         
-        # Save bytes to session state for local triggers
         with open(video_path, "rb") as f:
             st.session_state.generated_video = f.read()
         with open(audio_path, "rb") as f:
@@ -533,8 +586,7 @@ def video_maker(script_json: str) -> str:
 def virality_predictor(script_json: str) -> str:
     """
     Tool 5: ViralityPredictor
-    Trains an XGBoost model on the 50-row synthetic CSV file.
-    Predicts the script's virality score (0-100).
+    Uses the cached XGBoost model trained on startup to predict the virality score.
     Features: trend_score, hook_word_count, topic_novelty.
     """
     script = json.loads(script_json)
@@ -543,32 +595,24 @@ def virality_predictor(script_json: str) -> str:
     hook_word_count = len(hook.split())
     topic = script.get("topic", "")
     
-    # Measure topic novelty using simple rules or Gemini evaluation
+    # Safely evaluate topic novelty using Gemini
     try:
-        model = genai.GenerativeModel(gemini_model_name)
-        novelty_res = model.generate_content(
-            f"Rate the novelty of this topic on a scale of 0 to 100 where 100 is highly unique: '{topic}'. Answer with only the integer number."
-        )
-        topic_novelty = float(re.findall(r'\d+', novelty_res.text)[0])
+        prompt = f"Rate the novelty of this topic on a scale of 0 to 100 where 100 is highly unique: '{topic}'. Answer with only the integer number."
+        novelty_text = call_gemini_safe(prompt)
+        topic_novelty = float(re.findall(r'\d+', novelty_text)[0])
     except Exception:
         topic_novelty = 65.0
-        if any(w in topic.lower() for w in ["openai", "quantum", "llm", "agentic", "apple", "deepseek"]):
+        if any(w in topic.lower() for w in ["openai", "quantum", "llm", "agentic", "apple", "deepseek", "verge", "techcrunch"]):
             topic_novelty = 88.0
             
-    # Load 50-row CSV
-    df = pd.read_csv(csv_path)
-    X_train = df[["trend_score", "hook_word_count", "topic_novelty"]]
-    y_train = df["virality_score"]
-    
-    # Fit model
-    xgb = XGBRegressor(n_estimators=30, max_depth=3, learning_rate=0.1, random_state=42)
-    xgb.fit(X_train, y_train)
+    # Load cached XGBoost Model
+    xgb = get_cached_xgboost_model()
     
     # Run Inference
     input_data = pd.DataFrame([{
         "trend_score": trend_score,
         "hook_word_count": hook_word_count,
-        "topic_novelty": topic_novelty
+        "novelty": topic_novelty
     }])
     pred = xgb.predict(input_data)[0]
     pred = round(float(pred), 1)
@@ -584,8 +628,8 @@ def virality_predictor(script_json: str) -> str:
     }
     return json.dumps(res)
 
-# Register tools as LangChain Lambda objects for sequence modeling
-reddit_tool_node = RunnableLambda(lambda x: reddit_trend_tool.invoke(""))
+# Register tools as LangChain nodes
+reddit_and_rss_node = RunnableLambda(lambda x: reddit_and_rss_trend_tool.invoke(""))
 ranker_node = RunnableLambda(lambda x: trend_ranker.invoke(x))
 writer_node = RunnableLambda(lambda x: script_writer.invoke(x))
 video_node = RunnableLambda(lambda x: video_maker.invoke(x))
@@ -597,13 +641,12 @@ predictor_node = RunnableLambda(lambda x: virality_predictor.invoke(x))
 
 st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
 st.markdown("### 🤖 LangChain Agent Flow Orchestration")
-st.write("Click below to trigger the LangChain Agent. It will execute the 5 tools in sequence, showing logs and outcomes in real-time.")
+st.write("Click below to run the LangChain Agent. It merges Reddit + RSS feeds (TechCrunch & The Verge), ranks them, scripts the best topic using Gemini, compiles media, and evaluates virality using cached XGBoost.")
 
 run_agent_btn = st.button("🚀 Run LangChain Agent Pipeline")
 st.markdown("</div>", unsafe_allow_html=True)
 
 if run_agent_btn:
-    # Reset logs
     st.session_state.agent_logs = []
     st.session_state.agent_run_complete = False
     
@@ -611,11 +654,11 @@ if run_agent_btn:
     log_container = st.container()
     
     with st.spinner("Agent running tools..."):
-        # Tool 1: Reddit Trends
-        st.session_state.agent_logs.append("Executing RedditTrendTool...")
+        # Tool 1: Reddit + RSS
+        st.session_state.agent_logs.append("Executing RedditAndRSSTrendTool...")
         with log_container:
-            st.markdown("<div class='agent-step'>🛠️ <b>Step 1: RedditTrendTool</b> - Querying r/MachineLearning, r/startups, and r/technology...</div>", unsafe_allow_html=True)
-        raw_trends = reddit_tool_node.invoke(None)
+            st.markdown("<div class='agent-step'>🛠️ <b>Step 1: RedditAndRSSTrendTool</b> - Harvester querying Reddit, TechCrunch, and The Verge RSS...</div>", unsafe_allow_html=True)
+        raw_trends = reddit_and_rss_node.invoke(None)
         st.session_state.trend_results = json.loads(raw_trends)
         
         # Tool 2: Trend Ranker
@@ -628,7 +671,7 @@ if run_agent_btn:
         # Tool 3: Script Writer
         st.session_state.agent_logs.append("Executing ScriptWriter...")
         with log_container:
-            st.markdown("<div class='agent-step'>🛠️ <b>Step 3: ScriptWriter</b> - Drafting script JSON using Gemini 1.5 Flash...</div>", unsafe_allow_html=True)
+            st.markdown("<div class='agent-step'>🛠️ <b>Step 3: ScriptWriter</b> - Drafting script JSON using Gemini with 429 error handling...</div>", unsafe_allow_html=True)
         script_json = writer_node.invoke(ranked_trends_json)
         st.session_state.generated_script = json.loads(script_json)
         
@@ -642,7 +685,7 @@ if run_agent_btn:
         # Tool 5: Virality Predictor
         st.session_state.agent_logs.append("Executing ViralityPredictor...")
         with log_container:
-            st.markdown("<div class='agent-step'>🛠️ <b>Step 5: ViralityPredictor</b> - Predicting final virality index using XGBoost...</div>", unsafe_allow_html=True)
+            st.markdown("<div class='agent-step'>🛠️ <b>Step 5: ViralityPredictor</b> - Predicting final virality index using cached XGBoost...</div>", unsafe_allow_html=True)
         virality_json = predictor_node.invoke(script_json)
         st.session_state.virality_data = json.loads(virality_json)
         
@@ -657,23 +700,19 @@ if st.session_state.agent_run_complete:
     col_out1, col_out2 = st.columns([1, 1])
     
     with col_out1:
-        # Show Ranked Trends
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("#### 🔥 Identified Reddit Trends (RF Ranked)")
+        st.markdown("#### 🔥 Identified Trends (Reddit + TechCrunch + The Verge)")
         
         df_trends = pd.DataFrame(st.session_state.trend_results)
-        # Select and rename columns
         df_trends = df_trends[["title", "subreddit", "upvotes", "num_comments", "hours_since_post", "score"]]
-        df_trends.columns = ["Title", "Subreddit", "Upvotes", "Comments", "Age (hrs)", "RF Score"]
+        df_trends.columns = ["Title", "Source", "Upvotes", "Comments", "Age (hrs)", "RF Score"]
         
-        # Highlight top post
         st.dataframe(df_trends, height=280)
         st.info(f"🏆 Top trend selected for production: **{st.session_state.generated_script.get('topic', '')}**")
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # Show Virality score
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("#### 📈 Predicted Virality Score (XGBoost)")
+        st.markdown("#### 📈 Predicted Virality Score (Cached XGBoost)")
         
         v_score = st.session_state.virality_data.get("virality_score", 0)
         v_feats = st.session_state.virality_data.get("features", {})
@@ -688,7 +727,6 @@ if st.session_state.agent_run_complete:
         st.markdown("</div>", unsafe_allow_html=True)
         
     with col_out2:
-        # Show Script JSON
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.markdown("#### 📝 Generated Script JSON")
         st.json({
@@ -700,7 +738,6 @@ if st.session_state.agent_run_complete:
         })
         st.markdown("</div>", unsafe_allow_html=True)
         
-        # Show Compiled Video
         st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
         st.markdown("#### 🎬 Compiled Reel Preview")
         if "generated_video" in st.session_state and st.session_state.generated_video:
