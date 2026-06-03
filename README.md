@@ -4,7 +4,7 @@
 
 Ratefluencer AI is an end-to-end AI-powered content creation platform that automatically discovers trends, generates viral content ideas, creates short-form reel scripts, produces downloadable MP4 reels, generates LinkedIn and Instagram content, and predicts content virality before publishing.
 
-Built for **Track 2: AI Viral Reel Creator Agent Hackathon Challenge**.
+
 
 ---
 
@@ -355,12 +355,6 @@ Available formats:
 * Team collaboration
 * Creator analytics dashboard
 * AI video scene generation
-
-# 👨‍💻 Team
-
-Built for the AI Viral Reel Creator Hackathon.
-
-Ratefluencer AI demonstrates how autonomous AI agents can automate the entire content creation lifecycle from trend discovery to publishing-ready assets.
 
 # ⭐ Conclusion
 
