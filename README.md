@@ -1,4 +1,4 @@
-# 🚀 Ratefluencer AI
+<img width="1911" height="969" alt="image" src="https://github.com/user-attachments/assets/1a8dd5c8-f453-47b2-bd00-93094209a557" /># 🚀 Ratefluencer AI
 
 ### AI Viral Reel Creator & Virality Prediction Platform
 
@@ -325,6 +325,16 @@ gcloud run deploy ratefluencer-ai \
 8. Generate Instagram caption
 9. Review virality score
 10. Export campaign package
+
+## Screenshots
+<img width="1911" height="969" alt="image" src="https://github.com/user-attachments/assets/4a34f48e-30e8-4215-98d3-c2d70d87bbf7" />
+<img width="1911" height="976" alt="image" src="https://github.com/user-attachments/assets/b042dbd8-1ea1-4e0c-a55a-401b5d94a8d8" />
+<img width="1911" height="965" alt="image" src="https://github.com/user-attachments/assets/4491fab1-1915-4fa9-af1b-a34728e51638" />
+
+
+
+## Live Demo
+Project Link:https://ratefluencer-tskpi7osfq-uc.a.run.app/
 
 # 📦 Export Package
 
